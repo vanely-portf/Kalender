@@ -1,0 +1,10 @@
+{
+  "name": "freundes-kalender",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PWA zur gemeinsamen Termin- und Ferienplanung im Freundeskreis",
+  "scripts": {
+    "start": "sh start.sh",
+    "dev": "sh start.sh"
+  }
+}
