@@ -17,7 +17,14 @@
 //   appId: "1:123456789:web:abc123"
 // };
 
-export const FIREBASE_CONFIG = null;
+export const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCS3EoViYn5o33IJJfqIivEcqcQCTcBTqA",
+  authDomain: "friendlender.firebaseapp.com",
+  projectId: "friendlender",
+  storageBucket: "friendlender.firebasestorage.app",
+  messagingSenderId: "826902313364",
+  appId: "1:826902313364:web:7957921314c709448a3781"
+};
 
 // Name der "Gruppe" – erlaubt mehrere Freundeskreise im selben Firebase-Projekt.
 export const GRUPPE = "freundeskreis";

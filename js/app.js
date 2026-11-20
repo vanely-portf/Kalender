@@ -552,6 +552,8 @@ async function start() {
     $(id).addEventListener("close", () => setTimeout(einladungPruefen, 400)));
 
   if (!app.ich) profilOeffnen();
+  // Bereits bekanntes Profil in die gemeinsame Liste übernehmen (z. B. nach dem Wechsel auf Firebase)
+  else daten.personSpeichern(app.ich).catch((e) => console.warn("Profil:", e));
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js").catch((e) => console.warn("SW:", e));
