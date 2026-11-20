@@ -4,7 +4,7 @@
 import * as daten from "./storage.js";
 import {
   STATUS, MONATE, WOCHENTAGE_KURZ, monatsRaster, verfuegbarkeit,
-  besteTage, datumLang, datumKurz, heuteIso, ausIso,
+  besteTage, datumLang, datumKurz, heuteIso, ausIso, betrifftTag,
 } from "./calendar.js";
 
 const FARBEN = ["#e5484d", "#f97316", "#eab308", "#22a55b", "#14b8a6",
@@ -22,6 +22,9 @@ const app = {
   ich: ladeProfil(),         // { name, farbe }
   bearbeiteId: null,
   gewaehlterStatus: "frei",
+  eingeladen: new Set(),     // im Formular ausgewählte Freunde
+  spaeter: new Set(),        // Einladungen, die "später" entschieden werden
+  offeneEinladung: null,     // ID der Einladung im Popup
 };
 
 // ---------- Hilfen ----------
@@ -63,6 +66,7 @@ function toast(text, fehler = false) {
 function render() {
   renderKopf();
   renderRaster();
+  renderTag();
   renderListe();
   renderBeste();
   renderLegende();
@@ -123,17 +127,33 @@ function eintragHtml(e, mitDatum, i = 0) {
   const mehrtaegig = e.ende && e.ende !== e.start
     ? ` · ${datumKurz(e.start)} – ${datumKurz(e.ende)}` : "";
   const meins = app.ich && e.name === app.ich.name;
-  return `<li class="eintrag" style="--i:${i}">
+  const eingeladen = e.eingeladen || [];
+  const antworten = e.antworten || {};
+  const ichEingeladen = app.ich && eingeladen.includes(app.ich.name);
+  const gaeste = eingeladen.length
+    ? `<div class="gaeste">👥 ${eingeladen.map((n) => {
+        const a = antworten[n];
+        const zeichen = a === "ja" ? "✓" : a === "nein" ? "✗" : "?";
+        return `<span class="gast ${a || "offen"}" title="${esc(n)}">${avatar(n, farbeVon(n), "mini-av")}<b>${zeichen}</b></span>`;
+      }).join("")}</div>` : "";
+  const antwortKnoepfe = ichEingeladen && !antworten[app.ich.name]
+    ? `<div class="antwort-zeile">
+        <span>📩 Du bist eingeladen!</span>
+        <button type="button" class="mini-btn nein" data-antwort="nein" data-id="${e.id}">✗ Absagen</button>
+        <button type="button" class="mini-btn ja" data-antwort="ja" data-id="${e.id}">✓ Zusagen</button>
+      </div>` : "";
+  return `<li class="eintrag ${app.gewaehlt && betrifftTag(e, app.gewaehlt) && mitDatum ? "markiert" : ""}" style="--i:${i}">
     ${avatar(e.name, farbeVon(e.name))}
     <div class="eintrag-text">
       <div class="eintrag-zeile1">
         <strong>${esc(e.name)}</strong>
         <span class="badge" style="--c:${s.farbe}">${s.emoji || ""} ${s.label}</span>
       </div>
+      ${e.notiz ? `<div class="eintrag-titel">${esc(e.notiz)}</div>` : ""}
       <div class="eintrag-zeile2">
         ${mitDatum ? `${datumKurz(e.start)} · ` : ""}${zeit}${mehrtaegig}
-        ${e.notiz ? `<br><em>${esc(e.notiz)}</em>` : ""}
       </div>
+      ${gaeste}${antwortKnoepfe}
     </div>
     ${meins ? `<div class="eintrag-aktionen">
       <button type="button" class="icon-btn" data-bearbeiten="${e.id}" aria-label="Bearbeiten">✎</button>
@@ -142,36 +162,33 @@ function eintragHtml(e, mitDatum, i = 0) {
   </li>`;
 }
 
+function renderTag() {
+  const karte = $("tag-karte");
+  if (!app.gewaehlt) { karte.hidden = true; return; }
+  karte.hidden = false;
+  const v = verfuegbarkeit(app.personen, app.eintraege, app.gewaehlt);
+  $("tag-titel").textContent = datumLang(app.gewaehlt);
+  const info = $("tages-info");
+  info.hidden = v.gesamt === 0;
+  const alle = v.gesamt > 0 && v.verfuegbar.length === v.gesamt;
+  info.className = "tages-info" + (alle ? " alle" : v.verfuegbar.length / v.gesamt < 0.5 ? " wenige" : "");
+  info.innerHTML = `<div class="info-zeile"><strong>${alle ? "🎉 Alle haben Zeit!" : `${v.verfuegbar.length} von ${v.gesamt} verfügbar`}</strong>
+    <span class="avatar-reihe">${v.verfuegbar.map((p) => avatar(p.name, p.farbe, "klein")).join("")}</span></div>`;
+  $("tag-liste").innerHTML = v.eintraege.length
+    ? v.eintraege.map((e, i) => eintragHtml(e, false, i)).join("")
+    : `<li class="leer-hinweis"><span class="leer-emoji">🌤️</span>Noch keine Einträge an diesem Tag.<br>Sei die erste Person!</li>`;
+}
+
 function renderListe() {
-  const liste = $("liste");
-  if (app.gewaehlt) {
-    const v = verfuegbarkeit(app.personen, app.eintraege, app.gewaehlt);
-    $("liste-titel").textContent = datumLang(app.gewaehlt);
-    $("alle-btn").hidden = false;
-    $("neu-btn").hidden = false;
-    const info = $("tages-info");
-    info.hidden = v.gesamt === 0;
-    const alle = v.gesamt > 0 && v.verfuegbar.length === v.gesamt;
-    info.className = "tages-info" + (alle ? " alle" : v.verfuegbar.length / v.gesamt < 0.5 ? " wenige" : "");
-    info.innerHTML = `<div class="info-zeile"><strong>${alle ? "🎉 Alle haben Zeit!" : `${v.verfuegbar.length} von ${v.gesamt} verfügbar`}</strong>
-      <span class="avatar-reihe">${v.verfuegbar.map((p) => avatar(p.name, p.farbe, "klein")).join("")}</span></div>`;
-    liste.innerHTML = v.eintraege.length
-      ? v.eintraege.map((e, i) => eintragHtml(e, false, i)).join("")
-      : `<li class="leer-hinweis"><span class="leer-emoji">🌤️</span>Noch keine Einträge an diesem Tag.<br>Sei die erste Person!</li>`;
-  } else {
-    $("liste-titel").textContent = `Termine im ${MONATE[app.monat]}`;
-    $("alle-btn").hidden = true;
-    $("neu-btn").hidden = true;
-    $("tages-info").hidden = true;
-    const von = `${app.jahr}-${String(app.monat + 1).padStart(2, "0")}-01`;
-    const bis = `${app.jahr}-${String(app.monat + 1).padStart(2, "0")}-31`;
-    const imMonat = app.eintraege
-      .filter((e) => e.start <= bis && (e.ende || e.start) >= von)
-      .sort((a, b) => a.start.localeCompare(b.start) || (a.von || "").localeCompare(b.von || ""));
-    liste.innerHTML = imMonat.length
-      ? imMonat.map((e, i) => eintragHtml(e, true, i)).join("")
-      : `<li class="leer-hinweis"><span class="leer-emoji">📭</span>Noch keine Einträge in diesem Monat.<br>Tippe auf einen Tag, um etwas einzutragen.</li>`;
-  }
+  $("liste-titel").textContent = `Termine im ${MONATE[app.monat]}`;
+  const von = `${app.jahr}-${String(app.monat + 1).padStart(2, "0")}-01`;
+  const bis = `${app.jahr}-${String(app.monat + 1).padStart(2, "0")}-31`;
+  const imMonat = app.eintraege
+    .filter((e) => e.start <= bis && (e.ende || e.start) >= von)
+    .sort((a, b) => a.start.localeCompare(b.start) || (a.von || "").localeCompare(b.von || ""));
+  $("liste").innerHTML = imMonat.length
+    ? imMonat.map((e, i) => eintragHtml(e, true, i)).join("")
+    : `<li class="leer-hinweis"><span class="leer-emoji">📭</span>Noch keine Einträge in diesem Monat.<br>Tippe auf einen Tag, um etwas einzutragen.</li>`;
 }
 
 function renderBeste() {
@@ -243,22 +260,40 @@ function statusChipsRendern() {
   ).join("");
 }
 
+function freundeChipsRendern() {
+  const andere = app.personen.filter((p) => p.name !== app.ich?.name)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  $("einladen-feld").hidden = false;
+  if (!andere.length) {
+    $("freunde-auswahl").innerHTML = `<p class="klein-hinweis">Noch keine Freunde in der App. Lade sie unten bei der Legende ein.</p>`;
+    return;
+  }
+  const alleGewaehlt = andere.every((p) => app.eingeladen.has(p.name));
+  $("freunde-auswahl").innerHTML =
+    `<button type="button" class="freund-chip alle-chip ${alleGewaehlt ? "aktiv" : ""}" data-alle="1">Alle</button>` +
+    andere.map((p) => `<button type="button" class="freund-chip ${app.eingeladen.has(p.name) ? "aktiv" : ""}"
+      data-freund="${esc(p.name)}" style="--p:${p.farbe}">${avatar(p.name, p.farbe, "mini-av")} ${esc(p.name)}</button>`).join("");
+}
+
 function eintragOeffnen(iso, eintrag = null) {
   if (!app.ich) return profilOeffnen();
   app.bearbeiteId = eintrag?.id || null;
   app.gewaehlterStatus = eintrag?.status || "frei";
   const start = eintrag?.start || iso;
   $("eintrag-dialog").dataset.start = start;
-  $("eintrag-titel").textContent = eintrag ? "Eintrag bearbeiten" : "Neuer Eintrag";
+  $("titel").value = eintrag?.notiz || "";
+  $("titel").placeholder = eintrag ? "Eintrag bearbeiten" : "Neuer Eintrag";
   $("eintrag-datum").textContent = datumLang(start);
+  app.eingeladen = new Set(eintrag?.eingeladen || []);
+  freundeChipsRendern();
   $("von").value = eintrag?.von || "";
   $("bis").value = eintrag?.bis || "";
   $("ende").value = eintrag?.ende && eintrag.ende !== eintrag.start ? eintrag.ende : "";
   $("ende").min = start;
-  $("notiz").value = eintrag?.notiz || "";
   $("eintrag-fehler").textContent = "";
   statusChipsRendern();
   $("eintrag-dialog").showModal();
+  if (!eintrag) setTimeout(() => $("titel").focus(), 50);
 }
 
 async function eintragSpeichern(ev) {
@@ -275,6 +310,11 @@ async function eintragSpeichern(ev) {
   if (ende < start) return (fehler.textContent = "Das Bis-Datum darf nicht vor dem Starttag liegen.");
 
   const alt = app.eintraege.find((e) => e.id === app.bearbeiteId);
+  const eingeladen = [...app.eingeladen];
+  // Bisherige Antworten behalten, aber nur von Personen, die noch eingeladen sind
+  const antworten = Object.fromEntries(
+    Object.entries(alt?.antworten || {}).filter(([n]) => eingeladen.includes(n))
+  );
   try {
     await daten.eintragSpeichern({
       id: app.bearbeiteId || undefined,
@@ -283,10 +323,12 @@ async function eintragSpeichern(ev) {
       start, ende,
       status: app.gewaehlterStatus,
       von, bis,
-      notiz: $("notiz").value.trim(),
+      notiz: $("titel").value.trim(),
+      eingeladen,
+      antworten,
     });
     $("eintrag-dialog").close();
-    toast("Gespeichert ✓");
+    toast(eingeladen.length ? `Gespeichert ✓ ${eingeladen.length} eingeladen` : "Gespeichert ✓");
     konfetti();
   } catch (e) {
     console.error(e);
@@ -311,6 +353,62 @@ async function eintragLoeschen(id, knopf) {
   }
 }
 
+// ---------- Einladungen ----------
+function offeneEinladungen() {
+  if (!app.ich) return [];
+  const heute = heuteIso();
+  return app.eintraege
+    .filter((e) => (e.eingeladen || []).includes(app.ich.name))
+    .filter((e) => !(e.antworten || {})[app.ich.name])
+    .filter((e) => (e.ende || e.start) >= heute)
+    .sort((a, b) => a.start.localeCompare(b.start));
+}
+
+function einladungPruefen() {
+  const dlg = $("einladung-dialog");
+  if (dlg.open || $("eintrag-dialog").open || $("profil-dialog").open) return;
+  const e = offeneEinladungen().find((x) => !app.spaeter.has(x.id));
+  if (!e) return;
+  app.offeneEinladung = e.id;
+  const s = STATUS[e.status] || { emoji: "", label: "" };
+  const zeit = e.von ? `${e.von}${e.bis ? "–" + e.bis : ""} Uhr` : "ganztags";
+  const andere = (e.eingeladen || []).filter((n) => n !== app.ich.name);
+  $("einladung-titel").textContent = `${e.name} lädt dich ein!`;
+  $("einladung-text").innerHTML = `
+    <div class="einladung-karte">
+      ${avatar(e.name, farbeVon(e.name))}
+      <div>
+        <strong>${esc(e.notiz || s.label || "Treffen")}</strong>
+        <div>${s.emoji} ${datumLang(e.start)}</div>
+        <div>🕒 ${zeit}</div>
+      </div>
+    </div>
+    ${andere.length ? `<p class="klein-hinweis">Auch eingeladen: ${andere.map(esc).join(", ")}</p>` : ""}`;
+  dlg.showModal();
+}
+
+async function antworten(id, antwort) {
+  try {
+    await daten.antwortSpeichern(id, app.ich.name, antwort);
+    if (antwort === "ja") { toast("Zugesagt 🎉"); konfetti(); }
+    else toast("Abgesagt");
+  } catch (e) {
+    console.error(e);
+    toast("Antwort konnte nicht gespeichert werden.", true);
+  }
+}
+
+async function appTeilen() {
+  const url = location.href.split("#")[0];
+  const text = "Plan mit uns im Freundeskalender! Trag ein, wann du Zeit hast 📅";
+  if (navigator.share) {
+    try { await navigator.share({ title: "Freundeskalender", text, url }); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  $("link-feld").value = url;
+  $("link-dialog").showModal();
+}
+
 // ---------- Ereignisse ----------
 function monatWechseln(delta) {
   const d = new Date(app.jahr, app.monat + delta, 1);
@@ -329,7 +427,7 @@ function tagWaehlen(iso) {
   app.monat = d.getMonth();
   app.gewaehlt = app.gewaehlt === iso ? null : iso;
   render();
-  if (app.gewaehlt) $("liste-titel").scrollIntoView({ behavior: "smooth", block: "start" });
+  if (app.gewaehlt) $("tag-karte").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function ereignisse() {
@@ -355,13 +453,52 @@ function ereignisse() {
     const b = e.target.closest("[data-iso]");
     if (b) tagWaehlen(b.dataset.iso);
   };
-  $("alle-btn").onclick = () => { app.gewaehlt = null; render(); };
+  $("tag-schliessen").onclick = () => { app.gewaehlt = null; render(); };
   $("neu-btn").onclick = () => eintragOeffnen(app.gewaehlt);
-  $("liste").onclick = (e) => {
+  const listenKlick = (e) => {
     const bearb = e.target.closest("[data-bearbeiten]");
     const loe = e.target.closest("[data-loeschen]");
+    const antw = e.target.closest("[data-antwort]");
     if (bearb) eintragOeffnen(null, app.eintraege.find((x) => x.id === bearb.dataset.bearbeiten));
     if (loe) eintragLoeschen(loe.dataset.loeschen, loe);
+    if (antw) antworten(antw.dataset.id, antw.dataset.antwort);
+  };
+  $("liste").onclick = listenKlick;
+  $("tag-liste").onclick = listenKlick;
+
+  // Einladungen
+  $("freunde-auswahl").onclick = (e) => {
+    const b = e.target.closest("[data-freund], [data-alle]");
+    if (!b) return;
+    const andere = app.personen.filter((p) => p.name !== app.ich?.name).map((p) => p.name);
+    if (b.dataset.alle) {
+      const alle = andere.every((n) => app.eingeladen.has(n));
+      app.eingeladen = new Set(alle ? [] : andere);
+    } else {
+      const n = b.dataset.freund;
+      app.eingeladen.has(n) ? app.eingeladen.delete(n) : app.eingeladen.add(n);
+    }
+    // Wer Freunde einlädt, plant meist ein Treffen
+    if (app.eingeladen.size && app.gewaehlterStatus === "frei") {
+      app.gewaehlterStatus = "treffen";
+      statusChipsRendern();
+    }
+    freundeChipsRendern();
+  };
+  $("einladung-ja").onclick = () => { $("einladung-dialog").close(); antworten(app.offeneEinladung, "ja"); };
+  $("einladung-nein").onclick = () => { $("einladung-dialog").close(); antworten(app.offeneEinladung, "nein"); };
+  $("einladung-spaeter").onclick = () => {
+    app.spaeter.add(app.offeneEinladung);
+    $("einladung-dialog").close();
+    setTimeout(einladungPruefen, 300);
+  };
+  $("einladung-dialog").addEventListener("cancel", () => app.spaeter.add(app.offeneEinladung));
+  $("einladen-btn").onclick = appTeilen;
+  $("link-zu").onclick = () => $("link-dialog").close();
+  $("link-kopieren").onclick = async () => {
+    const f = $("link-feld");
+    try { await navigator.clipboard.writeText(f.value); toast("Link kopiert ✓"); $("link-dialog").close(); }
+    catch { f.select(); toast("Bitte Link markieren und kopieren"); }
   };
 
   // Profil
@@ -409,7 +546,10 @@ async function start() {
       if (p) app.ich.farbe = p.farbe;
     }
     render();
+    einladungPruefen();
   });
+  ["eintrag-dialog", "profil-dialog"].forEach((id) =>
+    $(id).addEventListener("close", () => setTimeout(einladungPruefen, 400)));
 
   if (!app.ich) profilOeffnen();
 

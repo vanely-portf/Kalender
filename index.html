@@ -49,14 +49,20 @@
       </p>
     </section>
 
-    <!-- Auflistung / Tagesansicht -->
-    <section class="karte">
+    <!-- Tagesansicht (erscheint beim Antippen eines Tages) -->
+    <section class="karte tag-karte" id="tag-karte" hidden>
       <div class="liste-kopf">
-        <h2 id="liste-titel">Termine im Monat</h2>
-        <button id="alle-btn" class="link-btn" type="button" hidden>Ganzer Monat</button>
+        <h2 id="tag-titel"></h2>
+        <button id="tag-schliessen" class="schliessen-btn" type="button" aria-label="Tagesansicht schliessen">✕</button>
       </div>
       <div id="tages-info" class="tages-info" hidden></div>
-      <button id="neu-btn" class="primaer-btn" type="button" hidden>+ Eintrag für diesen Tag</button>
+      <button id="neu-btn" class="primaer-btn" type="button">+ Eintrag für diesen Tag</button>
+      <ul id="tag-liste" class="liste"></ul>
+    </section>
+
+    <!-- Auflistung aller Termine im Monat (bleibt immer sichtbar) -->
+    <section class="karte">
+      <h2 id="liste-titel">Termine im Monat</h2>
       <ul id="liste" class="liste"></ul>
     </section>
 
@@ -73,6 +79,7 @@
       <ul id="legende-personen" class="legende"></ul>
       <h3>Status</h3>
       <ul id="legende-status" class="legende"></ul>
+      <button id="einladen-btn" class="sek-btn einladen-btn" type="button">➕ Freunde zur App einladen</button>
     </section>
   </main>
 
@@ -100,7 +107,8 @@
   <dialog id="eintrag-dialog" class="sheet">
     <form id="eintrag-form" method="dialog" novalidate>
       <div class="griff"></div>
-      <h2 id="eintrag-titel">Neuer Eintrag</h2>
+      <input id="titel" class="titel-input" type="text" maxlength="60"
+        placeholder="Neuer Eintrag" aria-label="Titel des Eintrags" autocomplete="off" />
       <p id="eintrag-datum" class="unter"></p>
 
       <fieldset>
@@ -121,9 +129,10 @@
         <input id="ende" type="date" />
       </label>
 
-      <label>Notiz (optional)
-        <input id="notiz" type="text" maxlength="80" placeholder="z. B. Zahnarzt, Geburtstag…" />
-      </label>
+      <fieldset id="einladen-feld">
+        <legend>👥 Freunde einladen (optional)</legend>
+        <div id="freunde-auswahl" class="freunde-chips"></div>
+      </fieldset>
 
       <p id="eintrag-fehler" class="fehler" role="alert"></p>
 
@@ -132,6 +141,34 @@
         <button type="submit" class="primaer-btn">Speichern</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Einladungs-Popup -->
+  <dialog id="einladung-dialog" class="popup">
+    <div class="popup-inhalt">
+      <div class="popup-emoji">📩</div>
+      <h2 id="einladung-titel">Neue Einladung</h2>
+      <div id="einladung-text" class="popup-text"></div>
+      <div class="aktionen gleich">
+        <button id="einladung-nein" type="button" class="sek-btn">✗ Absagen</button>
+        <button id="einladung-ja" type="button" class="primaer-btn">✓ Zusagen</button>
+      </div>
+      <button id="einladung-spaeter" type="button" class="link-btn spaeter">Später entscheiden</button>
+    </div>
+  </dialog>
+
+  <!-- Link zum Teilen (falls Teilen nicht direkt geht) -->
+  <dialog id="link-dialog" class="popup">
+    <div class="popup-inhalt">
+      <div class="popup-emoji">💌</div>
+      <h2>Freunde einladen</h2>
+      <p class="popup-text">Schick diesen Link an deine Freunde. Sie tragen ihren Namen ein und sind dabei.</p>
+      <input id="link-feld" type="text" readonly />
+      <div class="aktionen gleich">
+        <button id="link-zu" type="button" class="sek-btn">Schliessen</button>
+        <button id="link-kopieren" type="button" class="primaer-btn">Link kopieren</button>
+      </div>
+    </div>
   </dialog>
 
   <div id="konfetti" class="konfetti" aria-hidden="true"></div>

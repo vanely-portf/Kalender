@@ -75,6 +75,12 @@ const lokal = {
     zustand.eintraege = zustand.eintraege.filter((x) => x.id !== id);
     lokalSichern(); melden();
   },
+  async antwortSpeichern(id, name, antwort) {
+    const e = zustand.eintraege.find((x) => x.id === id);
+    if (!e) return;
+    e.antworten = { ...(e.antworten || {}), [name]: antwort };
+    lokalSichern(); melden();
+  },
 };
 
 // ---------- Firebase-Modus ----------
@@ -108,6 +114,10 @@ function firebaseBackend() {
     async eintragLoeschen(id) {
       await fs.deleteDoc(fs.doc(db, ...pfad("eintraege"), id));
     },
+    async antwortSpeichern(id, name, antwort) {
+      // Nur das eine Feld ändern, damit gleichzeitige Antworten sich nicht überschreiben
+      await fs.updateDoc(fs.doc(db, ...pfad("eintraege"), id), new fs.FieldPath("antworten", name), antwort);
+    },
   };
 }
 
@@ -139,4 +149,9 @@ export async function eintragSpeichern(eintrag) {
 
 export async function eintragLoeschen(id) {
   await backend.eintragLoeschen(id);
+}
+
+/** Antwort auf eine Einladung: "ja" oder "nein" */
+export async function antwortSpeichern(id, name, antwort) {
+  await backend.antwortSpeichern(id, name, antwort);
 }
