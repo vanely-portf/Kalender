@@ -1,145 +1,52 @@
 // ------------------------------------------------------------
-// Kleine Header-Animationen pro Design.
-// Jede Szene läuft einmal ab (ca. 6–10 s) und startet alle 20 s neu.
-// Das Aussehen und der Ablauf stehen in css/style.css unter "Header-Szenen".
+// Header-Animationen pro Design (laufen alle 20 s einmal ab).
+// Figuren als gezeichnete SVG-Illustrationen; Bewegung in css/style.css.
+// Diese Datei wird aus einem Generator erzeugt (Figuren + Abläufe).
 // ------------------------------------------------------------
 
 const zufall = (min, max) => (min + Math.random() * (max - min)).toFixed(2);
-
-// ---------- Bausteine ----------
-const vogel = (farbe) => `
-  <svg viewBox="0 0 40 24" aria-hidden="true">
-    <path class="fluegel" d="M20 12C14 3 7 2 2 6c6 0 12 3 18 6z" fill="${farbe}"/>
-    <path class="fluegel" d="M20 12C26 3 33 2 38 6c-6 0-12 3-18 6z" fill="${farbe}"/>
-    <ellipse cx="20" cy="13" rx="4.2" ry="2.6" fill="${farbe}"/>
-    <path d="M23.8 12.4l3 .6-3 .9z" fill="#EBD9AD"/>
-  </svg>`;
-
-const fledermaus = `
-  <svg viewBox="0 0 40 24" aria-hidden="true">
-    <path class="fluegel" d="M18.5 12C14 5 8 4.5 2 8c3 1 4.2 4 4 6.5 2-2 4.3-2 6 0 1.2-2 3.6-2.6 6.5-1.5z" fill="#0A070D"/>
-    <path class="fluegel" d="M21.5 12C26 5 32 4.5 38 8c-3 1-4.2 4-4 6.5-2-2-4.3-2-6 0-1.2-2-3.6-2.6-6.5-1.5z" fill="#0A070D"/>
-    <ellipse cx="20" cy="13" rx="2.8" ry="3.8" fill="#0A070D"/>
-    <path d="M18.3 9.8l.6-2.8 1.3 2.2zM21.7 9.8l-.6-2.8-1.3 2.2z" fill="#0A070D"/>
-    <circle cx="19.1" cy="11.6" r=".45" fill="#C79BD6"/><circle cx="20.9" cy="11.6" r=".45" fill="#C79BD6"/>
-  </svg>`;
-
-const schmetterling = `
-  <svg viewBox="0 0 40 30" aria-hidden="true">
-    <defs><linearGradient id="sz-fg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FBCFE8"/><stop offset=".5" stop-color="#C4B5FD"/><stop offset="1" stop-color="#A5F3FC"/></linearGradient></defs>
-    <g class="fluegel">
-      <path d="M19.5 15C16 5 6 3 4.5 9c-1 5 6 7.5 15 6z" fill="url(#sz-fg)" stroke="#fff" stroke-width=".6"/>
-      <path d="M19.5 16c-6 1-10 5-8 8 2 2.5 6.5 0 8-8z" fill="url(#sz-fg)" opacity=".85"/>
-    </g>
-    <g class="fluegel">
-      <path d="M20.5 15C24 5 34 3 35.5 9c1 5-6 7.5-15 6z" fill="url(#sz-fg)" stroke="#fff" stroke-width=".6"/>
-      <path d="M20.5 16c6 1 10 5 8 8-2 2.5-6.5 0-8-8z" fill="url(#sz-fg)" opacity=".85"/>
-    </g>
-    <path d="M20 10v13" stroke="#6B4FA0" stroke-width="1.4" stroke-linecap="round"/>
-  </svg>`;
-
 const funkeln = (farbe) => `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0l1.1 3.9L10 5 6.1 6.1 5 10 3.9 6.1 0 5l3.9-1.1z" fill="${farbe}"/></svg>`;
 
-const blatt = (farbe) => `<svg viewBox="0 0 12 14" aria-hidden="true"><path d="M6 .5C10 4 11 8.5 6 13.5 1 8.5 2 4 6 .5z" fill="${farbe}"/><path d="M6 2.5v9" stroke="rgba(0,0,0,.15)" stroke-width=".7"/></svg>`;
+const VOGEL = "<svg viewBox=\"0 0 64 44\" aria-hidden=\"true\"> <defs> <linearGradient id=\"v-koerper\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#6F8FA0\"/><stop offset=\"1\" stop-color=\"#2F4A5C\"/></linearGradient> <linearGradient id=\"v-fluegel\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#4F7383\"/><stop offset=\"1\" stop-color=\"#9DB8C6\"/></linearGradient> </defs> <g class=\"v-fluegel-f\"><path d=\"M30 22C30 12 38 5 50 4c-3 6-8 12-15 19z\" fill=\"#3E5A6B\"/></g> <path d=\"M50 21l12-5-4 6 5 4-13-1z\" fill=\"#2F4A5C\"/> <path d=\"M7 24c3-7 12-9 22-8 10 .5 17 3 25 3-4 5-11 9-21 10-12 1-23 .5-26-5z\" fill=\"url(#v-koerper)\"/> <path d=\"M12 27c6 3 17 3.6 26 1.4\" stroke=\"#E7EEF2\" stroke-width=\"3.2\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/> <circle cx=\"13.5\" cy=\"21\" r=\"7\" fill=\"url(#v-koerper)\"/> <path d=\"M7 21.5l-6 1.8 6 1.6z\" fill=\"#E8B04A\"/> <circle cx=\"11.3\" cy=\"19.8\" r=\"1.5\" fill=\"#0E1620\"/><circle cx=\"11.8\" cy=\"19.3\" r=\".5\" fill=\"#fff\"/> <ellipse cx=\"14.5\" cy=\"24.5\" rx=\"2.4\" ry=\"1.4\" fill=\"#EBD9AD\" opacity=\".55\"/> <g class=\"v-fluegel-n\"> <path d=\"M24 23C22 10 30 0 46-1c-2 7-7 15-15 24z\" fill=\"url(#v-fluegel)\"/> <path d=\"M30 20c2-6 6-11 12-14M33 21c2.5-5 6-9 10-11.5M27 19c1-6 4-11 9-15\" stroke=\"#E7EEF2\" stroke-width=\".7\" fill=\"none\" opacity=\".6\"/> </g> </svg>";
+const SCHMETTERLING = "<svg viewBox=\"0 0 64 52\" aria-hidden=\"true\"> <defs> <radialGradient id=\"s-oben\" cx=\".75\" cy=\".7\" r=\".9\"><stop offset=\"0\" stop-color=\"#FFE4F3\"/><stop offset=\".45\" stop-color=\"#F49AC9\"/><stop offset=\".8\" stop-color=\"#B99BF5\"/><stop offset=\"1\" stop-color=\"#7B5CC9\"/></radialGradient> <radialGradient id=\"s-unten\" cx=\".7\" cy=\".3\" r=\".9\"><stop offset=\"0\" stop-color=\"#E6FBFF\"/><stop offset=\".5\" stop-color=\"#84D4E8\"/><stop offset=\"1\" stop-color=\"#8A7BE0\"/></radialGradient> </defs> <g class=\"s-fluegel s-links\"> <path d=\"M31 24C27 11 17 3 8 4 1 5 2 15 7 21c5 5 14 6 24 4z\" fill=\"url(#s-oben)\" stroke=\"#6B4FA0\" stroke-width=\".9\"/> <path d=\"M31 27c-9 0-17 4-18 11-.6 5 4 8 9 5 4-3 8-9 9-16z\" fill=\"url(#s-unten)\" stroke=\"#6B4FA0\" stroke-width=\".9\"/> <path d=\"M30 24C22 17 14 11 8 8M30 24c-8-1-16 0-22-3M30 27c-6 4-11 9-14 14\" stroke=\"#fff\" stroke-width=\".6\" opacity=\".55\" fill=\"none\"/> <circle cx=\"12\" cy=\"10\" r=\"2.2\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"9\" cy=\"16\" r=\"1.3\" fill=\"#fff\" opacity=\".7\"/><circle cx=\"18\" cy=\"38\" r=\"1.5\" fill=\"#fff\" opacity=\".75\"/> </g> <g class=\"s-fluegel s-rechts\"> <path d=\"M33 24C37 11 47 3 56 4c7 1 6 11 1 17-5 5-14 6-24 4z\" fill=\"url(#s-oben)\" stroke=\"#6B4FA0\" stroke-width=\".9\"/> <path d=\"M33 27c9 0 17 4 18 11 .6 5-4 8-9 5-4-3-8-9-9-16z\" fill=\"url(#s-unten)\" stroke=\"#6B4FA0\" stroke-width=\".9\"/> <path d=\"M34 24c8-7 16-13 22-16M34 24c8-1 16 0 22-3M34 27c6 4 11 9 14 14\" stroke=\"#fff\" stroke-width=\".6\" opacity=\".55\" fill=\"none\"/> <circle cx=\"52\" cy=\"10\" r=\"2.2\" fill=\"#fff\" opacity=\".85\"/><circle cx=\"55\" cy=\"16\" r=\"1.3\" fill=\"#fff\" opacity=\".7\"/><circle cx=\"46\" cy=\"38\" r=\"1.5\" fill=\"#fff\" opacity=\".75\"/> </g> <ellipse cx=\"32\" cy=\"19\" rx=\"2.2\" ry=\"2.4\" fill=\"#4A3570\"/> <ellipse cx=\"32\" cy=\"27\" rx=\"2\" ry=\"6.5\" fill=\"#5B4188\"/> <path d=\"M32 33.5v8\" stroke=\"#5B4188\" stroke-width=\"2.6\" stroke-linecap=\"round\"/> <path d=\"M31.2 17.5C29 12 26 9 23 8M32.8 17.5C35 12 38 9 41 8\" stroke=\"#4A3570\" stroke-width=\".9\" fill=\"none\" stroke-linecap=\"round\"/> <circle cx=\"23\" cy=\"8\" r=\"1.1\" fill=\"#4A3570\"/><circle cx=\"41\" cy=\"8\" r=\"1.1\" fill=\"#4A3570\"/> </svg>";
+const FLEDERMAUS = "<svg viewBox=\"0 0 76 44\" aria-hidden=\"true\"> <defs> <radialGradient id=\"f-fell\" cx=\".45\" cy=\".35\" r=\".7\"><stop offset=\"0\" stop-color=\"#4A3752\"/><stop offset=\"1\" stop-color=\"#160F1A\"/></radialGradient> <linearGradient id=\"f-haut\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2E2236\"/><stop offset=\"1\" stop-color=\"#140D18\"/></linearGradient> </defs> <g class=\"f-fluegel f-links\"> <path d=\"M34 20C28 9 17 4 3 8c4 2 6 6 6 11 3-2 7-2 9 1 2-3 6-3 8 0 2-2 5-2 8 0z\" fill=\"url(#f-haut)\" opacity=\".96\"/> <path d=\"M33 19 4 8M33 19 13 9.5M33 19 23 9\" stroke=\"#5E4A68\" stroke-width=\".8\" stroke-linecap=\"round\"/> </g> <g class=\"f-fluegel f-rechts\"> <path d=\"M42 20C48 9 59 4 73 8c-4 2-6 6-6 11-3-2-7-2-9 1-2-3-6-3-8 0-2-2-5-2-8 0z\" fill=\"url(#f-haut)\" opacity=\".96\"/> <path d=\"M43 19 72 8M43 19 63 9.5M43 19 53 9\" stroke=\"#5E4A68\" stroke-width=\".8\" stroke-linecap=\"round\"/> </g> <ellipse cx=\"38\" cy=\"22\" rx=\"5.4\" ry=\"7.5\" fill=\"url(#f-fell)\"/> <circle cx=\"38\" cy=\"14\" r=\"4.6\" fill=\"url(#f-fell)\"/> <path d=\"M34.5 12 33.6 5.5 37 10.5zM41.5 12l.9-6.5-3.4 5z\" fill=\"#2A1F30\"/> <path d=\"M34.7 10.8 34.2 7.4 36 10zM41.3 10.8l.5-3.4-1.8 2.6z\" fill=\"#8E5A9E\" opacity=\".7\"/> <circle cx=\"36.3\" cy=\"14\" r=\".95\" fill=\"#F3D9FF\"/><circle cx=\"39.7\" cy=\"14\" r=\".95\" fill=\"#F3D9FF\"/> <path d=\"M37.2 16.6l.4 1 .4-1\" stroke=\"#EDE5EC\" stroke-width=\".5\" fill=\"none\"/> </svg>";
+const QUALLE = "<svg viewBox=\"0 0 54 86\" aria-hidden=\"true\"> <defs> <radialGradient id=\"q-glocke\" cx=\".5\" cy=\".35\" r=\".7\"><stop offset=\"0\" stop-color=\"#FFFFFF\" stop-opacity=\".95\"/><stop offset=\".55\" stop-color=\"#C9F3EC\" stop-opacity=\".75\"/><stop offset=\"1\" stop-color=\"#7FD4C8\" stop-opacity=\".55\"/></radialGradient> <radialGradient id=\"q-innen\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#F8B4C4\" stop-opacity=\".9\"/><stop offset=\"1\" stop-color=\"#F8B4C4\" stop-opacity=\"0\"/></radialGradient> </defs> <g class=\"q-tentakel\" stroke-linecap=\"round\" fill=\"none\"> <path class=\"q-t1\" d=\"M13 27c-3 8 3 13 0 21s3 13 0 21 2 10 0 14\" stroke=\"#9FDDEB\" stroke-width=\"1.2\" opacity=\".85\"/> <path class=\"q-t2\" d=\"M21 28c-2 9 3 14 0 22s2 12 0 20\" stroke=\"#B9EFE4\" stroke-width=\"1.2\" opacity=\".85\"/> <path class=\"q-t3\" d=\"M33 28c2 9-3 14 0 22s-2 12 0 20\" stroke=\"#B9EFE4\" stroke-width=\"1.2\" opacity=\".85\"/> <path class=\"q-t4\" d=\"M41 27c3 8-3 13 0 21s-3 13 0 21-2 10 0 14\" stroke=\"#9FDDEB\" stroke-width=\"1.2\" opacity=\".85\"/> <path class=\"q-arm\" d=\"M24 28c-3 5 2 8-1 13s3 7 0 12M30 28c3 5-2 8 1 13s-3 7 0 12\" stroke=\"#F8C6D2\" stroke-width=\"2.6\" opacity=\".7\"/> </g> <g class=\"q-glocke\"> <path d=\"M4 26C4 12 14 3 27 3s23 9 23 23c-3.5 2.8-6.5-.4-9.2 1.6-2.6-2.6-6 .8-9-1.2-3 2-6-1.4-9 .8-2.8-2-6 1-9-1.2-2.6 2-5.4-1-8.6.2z\" fill=\"url(#q-glocke)\" stroke=\"#7FD4C8\" stroke-width=\".9\"/> <ellipse cx=\"27\" cy=\"18\" rx=\"10\" ry=\"7\" fill=\"url(#q-innen)\"/> <path d=\"M11 15c3-6 9-9 15-9.4\" stroke=\"#fff\" stroke-width=\"2.2\" fill=\"none\" stroke-linecap=\"round\" opacity=\".9\"/> <circle cx=\"20.5\" cy=\"18.5\" r=\"1.3\" fill=\"#22534A\"/><circle cx=\"33.5\" cy=\"18.5\" r=\"1.3\" fill=\"#22534A\"/> <path d=\"M25 21.5q2 1.6 4 0\" stroke=\"#22534A\" stroke-width=\".9\" fill=\"none\" stroke-linecap=\"round\"/> <ellipse cx=\"17\" cy=\"21.5\" rx=\"2.2\" ry=\"1.1\" fill=\"#F6A6B2\" opacity=\".7\"/><ellipse cx=\"37\" cy=\"21.5\" rx=\"2.2\" ry=\"1.1\" fill=\"#F6A6B2\" opacity=\".7\"/> </g> </svg>";
+const IGEL = "<svg viewBox=\"0 0 104 72\" aria-hidden=\"true\"> <defs> <radialGradient id=\"i-stachel\" cx=\".5\" cy=\".35\" r=\".75\"><stop offset=\"0\" stop-color=\"#B58560\"/><stop offset=\".6\" stop-color=\"#8A5E40\"/><stop offset=\"1\" stop-color=\"#5E3E2A\"/></radialGradient> <radialGradient id=\"i-gesicht\" cx=\".35\" cy=\".35\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFF6EA\"/><stop offset=\"1\" stop-color=\"#EBD3B6\"/></radialGradient> </defs> <ellipse cx=\"54\" cy=\"68.5\" rx=\"32\" ry=\"3\" fill=\"rgba(75,64,56,.18)\"/> <g class=\"i-fuss i-fuss-hf\"><ellipse cx=\"72\" cy=\"65\" rx=\"4.6\" ry=\"3\" fill=\"#7A563F\"/></g> <g class=\"i-fuss i-fuss-vf\"><ellipse cx=\"36\" cy=\"65\" rx=\"4.6\" ry=\"3\" fill=\"#7A563F\"/></g> <g class=\"i-koerper\"> <ellipse cx=\"54\" cy=\"52\" rx=\"31\" ry=\"14\" fill=\"#F2DFC6\"/> <path d=\"M22.2 37.4 L16.4 32.7 L25.3 32.9 L21.1 27.5 L29.7 28.9 L27.1 23.0 L35.2 25.6 L34.3 19.5 L41.4 23.1 L42.4 17.0 L48.3 21.6 L51.0 15.7 L55.5 21.0 L59.8 15.6 L62.7 21.4 L68.5 16.8 L69.7 22.9 L76.7 19.1 L76.1 25.2 L84.0 22.5 L81.6 28.4 L90.2 26.9 L86.2 32.4 L95.0 32.0 L89.5 36.8 L98.3 37.7 L91.5 41.7 L93.5 54.0 Q56 66 26.0 52Z\" fill=\"url(#i-stachel)\"/> <path d=\"M35.3 38.7L26.3 35.5M37.7 36.3L29.7 32.1M40.6 34.2L34.0 29.1M44.1 32.6L38.9 26.7M48.0 31.3L44.5 25.0M52.1 30.6L50.5 23.9M56.4 30.4L56.6 23.6M60.7 30.7L62.7 24.0M64.8 31.5L68.6 25.2M68.6 32.8L74.1 27.1M72.0 34.6L78.9 29.6M74.8 36.7L83.0 32.7M77.0 39.2L86.2 36.2M78.5 41.8L88.4 40.0\" stroke=\"#D9B48C\" stroke-width=\"1\" opacity=\".55\" stroke-linecap=\"round\"/> <g class=\"i-bluete\"> <g fill=\"#FFFFFF\" stroke=\"#F0E6DA\" stroke-width=\".4\"> <ellipse cx=\"62\" cy=\"13.5\" rx=\"2.3\" ry=\"4.2\"/><ellipse cx=\"62\" cy=\"13.5\" rx=\"2.3\" ry=\"4.2\" transform=\"rotate(60 62 18)\"/> <ellipse cx=\"62\" cy=\"13.5\" rx=\"2.3\" ry=\"4.2\" transform=\"rotate(120 62 18)\"/><ellipse cx=\"62\" cy=\"13.5\" rx=\"2.3\" ry=\"4.2\" transform=\"rotate(180 62 18)\"/> <ellipse cx=\"62\" cy=\"13.5\" rx=\"2.3\" ry=\"4.2\" transform=\"rotate(240 62 18)\"/><ellipse cx=\"62\" cy=\"13.5\" rx=\"2.3\" ry=\"4.2\" transform=\"rotate(300 62 18)\"/> </g> <circle cx=\"62\" cy=\"18\" r=\"2.6\" fill=\"#F2C94C\"/><circle cx=\"61.2\" cy=\"17.2\" r=\".8\" fill=\"#FFF3C4\"/> <path d=\"M62 21c-.5 3-2 5-4 6.5\" stroke=\"#8FA67F\" stroke-width=\"1.1\" fill=\"none\"/> </g> <g class=\"i-kopf\"> <path d=\"M6 47c0-9 9-15.5 20-15 9 .5 13 7 12 15-1 7-7 11-17 11-9 0-15-4-15-11z\" fill=\"url(#i-gesicht)\"/> <path d=\"M26 33c2.5-3.5 6.5-3.5 8 0-1.5 2-5 2.2-8 0z\" fill=\"#E8C9A9\"/><path d=\"M27.8 33c1.4-1.6 3.4-1.6 4.4 0\" stroke=\"#E9A1A8\" stroke-width=\"1.2\" fill=\"none\" stroke-linecap=\"round\"/> <g class=\"i-nase\"><circle cx=\"5.2\" cy=\"46.5\" r=\"3\" fill=\"#2A1E1A\"/><circle cx=\"4.2\" cy=\"45.6\" r=\".9\" fill=\"#fff\" opacity=\".8\"/></g> <g class=\"i-auge\"><ellipse cx=\"18\" cy=\"41.5\" rx=\"2.3\" ry=\"2.7\" fill=\"#2A1E1A\"/><circle cx=\"18.8\" cy=\"40.5\" r=\".9\" fill=\"#fff\"/></g> <ellipse cx=\"21.5\" cy=\"48\" rx=\"3.2\" ry=\"1.9\" fill=\"#F2A7B0\" opacity=\".65\"/> <path d=\"M9 50.5q2 1.6 4.4.6\" stroke=\"#8A6A55\" stroke-width=\".9\" fill=\"none\" stroke-linecap=\"round\"/> </g> </g> <g class=\"i-fuss i-fuss-hn\"><ellipse cx=\"66\" cy=\"66\" rx=\"5\" ry=\"3.2\" fill=\"#8A6A55\"/></g> <g class=\"i-fuss i-fuss-vn\"><ellipse cx=\"30\" cy=\"66\" rx=\"5\" ry=\"3.2\" fill=\"#8A6A55\"/></g> </svg>";
+const KATZE = "<svg viewBox=\"0 0 124 86\" aria-hidden=\"true\"> <defs> <radialGradient id=\"k-fell\" cx=\".45\" cy=\".3\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFBF4\"/><stop offset=\".55\" stop-color=\"#F3E4CE\"/><stop offset=\"1\" stop-color=\"#D8C1A0\"/></radialGradient> <linearGradient id=\"k-punkt\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#8E6B55\"/><stop offset=\"1\" stop-color=\"#4E3428\"/></linearGradient> <radialGradient id=\"k-maske\" cx=\".38\" cy=\".62\" r=\".62\"><stop offset=\"0\" stop-color=\"#6E4E3D\"/><stop offset=\".55\" stop-color=\"#8E6B55\" stop-opacity=\".85\"/><stop offset=\"1\" stop-color=\"#A9866D\" stop-opacity=\"0\"/></radialGradient> <radialGradient id=\"k-auge\" cx=\".5\" cy=\".4\" r=\".6\"><stop offset=\"0\" stop-color=\"#B8E4FF\"/><stop offset=\".6\" stop-color=\"#5BA9E6\"/><stop offset=\"1\" stop-color=\"#2E6FB0\"/></radialGradient> <linearGradient id=\"k-bein-hinten\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#D9C4A6\"/><stop offset=\"1\" stop-color=\"#C8AF8E\"/></linearGradient> </defs> <ellipse class=\"k-schatten\" cx=\"62\" cy=\"82\" rx=\"40\" ry=\"3.6\" fill=\"rgba(60,30,30,.18)\"/> <g class=\"k-schwanz\"> <path d=\"M93 43C106 41 115 30 113 15c-.8-6.5-7.5-7.5-7.6-2 .5 10-3.4 19-15.4 23.5z\" fill=\"url(#k-punkt)\"/> <path d=\"M106 13c1.6 1 2.2 3 2 5.4\" stroke=\"#B08E76\" stroke-width=\"1.2\" fill=\"none\" stroke-linecap=\"round\" opacity=\".7\"/> </g> <g class=\"k-bein k-bein-hf\"><path d=\"M80 47c-1.8 11-2 20-1.4 29.5 2.4 1.6 5.4 1.6 7.6 0 .4-9.6 1.4-18.6 3.2-28z\" fill=\"url(#k-bein-hinten)\"/><ellipse cx=\"82.5\" cy=\"77.8\" rx=\"5\" ry=\"2.6\" fill=\"#F7F1EA\"/></g> <g class=\"k-bein k-bein-vf\"><path d=\"M37 47c-.8 11-.8 20-.4 29.5 2.4 1.6 5.4 1.6 7.6 0 .2-9.6.6-18.6 1.6-28z\" fill=\"url(#k-bein-hinten)\"/><ellipse cx=\"40\" cy=\"77.8\" rx=\"5\" ry=\"2.6\" fill=\"#F7F1EA\"/></g> <path d=\"M29 46c0-14 16.5-20.5 37-19.5 19 1 33 7.5 32 21-1 11.5-14.5 15-35 15-20 0-34-4.5-34-16.5z\" fill=\"url(#k-fell)\"/> <path d=\"M46 30c13-5 35-3.5 47 6-12-3-29-4.5-47-6z\" fill=\"#B48F72\" opacity=\".35\"/> <path d=\"M40 57c9 3.6 30 4 44-.4\" stroke=\"#FFFFFF\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\" opacity=\".45\"/> <g class=\"k-bein k-bein-hn\"><path d=\"M71 49c-1.8 11-2 19.5-1.2 28 2.6 1.8 6 1.8 8.6 0 .6-9 1.8-17.5 3.6-27z\" fill=\"url(#k-fell)\"/><ellipse cx=\"74\" cy=\"78.4\" rx=\"5.6\" ry=\"2.9\" fill=\"#FFFFFF\"/><path d=\"M71.5 78.2v1.4M74 78.3v1.5M76.5 78.2v1.4\" stroke=\"#E6DACB\" stroke-width=\".7\"/></g> <g class=\"k-bein k-bein-vn\"><path d=\"M43 49c-.8 11-.8 19.5-.4 28 2.6 1.8 6 1.8 8.6 0 .2-9 .6-17.5 1.6-27z\" fill=\"url(#k-fell)\"/><ellipse cx=\"46.6\" cy=\"78.4\" rx=\"5.6\" ry=\"2.9\" fill=\"#FFFFFF\"/><path d=\"M44 78.2v1.4M46.6 78.3v1.5M49.2 78.2v1.4\" stroke=\"#E6DACB\" stroke-width=\".7\"/></g> <ellipse cx=\"37\" cy=\"41\" rx=\"12.5\" ry=\"13.5\" fill=\"#FFF9F0\"/> <path d=\"M30 50c2 3 6 4.6 10 4\" stroke=\"#EDE0CE\" stroke-width=\"1.4\" fill=\"none\" stroke-linecap=\"round\"/> <g class=\"k-kopf\"> <g class=\"k-ohr\"><path d=\"M14 22 16.5 4.5 29 16.5z\" fill=\"url(#k-punkt)\"/><path d=\"M16.5 18.5 18 8.5 25.5 16z\" fill=\"#E8A8A0\" opacity=\".8\"/></g> <g class=\"k-ohr k-ohr2\"><path d=\"M30 15.5 40.5 2.5 44.5 19z\" fill=\"url(#k-punkt)\"/><path d=\"M32.5 15.5 39.8 6.5 42 17z\" fill=\"#E8A8A0\" opacity=\".85\"/></g> <ellipse cx=\"28\" cy=\"28.5\" rx=\"16.5\" ry=\"15\" fill=\"url(#k-fell)\"/> <path d=\"M40 34c3 3 4 7 2.4 10.4M42.6 30c2.8 2 3.8 5 3 8\" stroke=\"#F7EBDA\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/> <ellipse cx=\"22\" cy=\"31.5\" rx=\"13\" ry=\"11\" fill=\"url(#k-maske)\"/> <g class=\"k-augen\"> <path d=\"M5.8 26.2q3.2-3.2 6.6 0-3.2 3.1-6.6 0z\" fill=\"url(#k-auge)\"/> <ellipse cx=\"9\" cy=\"26.2\" rx=\".9\" ry=\"2.2\" fill=\"#14100E\"/> <path d=\"M15.6 26q4.9-4.6 9.8 0-4.9 4.6-9.8 0z\" fill=\"url(#k-auge)\"/> <ellipse cx=\"20.6\" cy=\"26\" rx=\"1.2\" ry=\"3.3\" fill=\"#14100E\"/> <circle cx=\"21.9\" cy=\"24.3\" r=\"1\" fill=\"#fff\"/><circle cx=\"10\" cy=\"24.9\" r=\".6\" fill=\"#fff\"/> <path d=\"M15.4 25.6q5.1-5.2 10.2 0\" stroke=\"#3E2A20\" stroke-width=\".9\" fill=\"none\"/> </g> <path d=\"M9.6 32.3h3.6l-1.8 2.3z\" fill=\"#D98C8C\"/> <path d=\"M11.4 34.6v1.2M11.4 35.8q1.4 2 3.4 1.2M11.4 35.8q-1.2 1.8-3 1.3\" stroke=\"#3B2A22\" stroke-width=\".8\" fill=\"none\" stroke-linecap=\"round\"/> <g stroke=\"#FFFFFF\" stroke-width=\".55\" opacity=\".85\" stroke-linecap=\"round\"><path d=\"M14 33.5 27 31.5M14 35 27 36M8 33.5-4 31M8 35-4 36.5\"/></g> <ellipse cx=\"25\" cy=\"36.5\" rx=\"3\" ry=\"1.6\" fill=\"#E9A9A0\" opacity=\".35\"/> </g> </svg>";
+const PUDDING = "<svg viewBox=\"0 0 36 36\" aria-hidden=\"true\"> <defs> <linearGradient id=\"p-flan\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#F7D394\"/><stop offset=\".55\" stop-color=\"#F2C27A\"/><stop offset=\"1\" stop-color=\"#D99E52\"/></linearGradient> <linearGradient id=\"p-teller\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#EBD3CF\"/></linearGradient> </defs> <ellipse cx=\"18\" cy=\"31.5\" rx=\"15\" ry=\"3.2\" fill=\"url(#p-teller)\" stroke=\"#E2B6B0\" stroke-width=\".6\"/> <g class=\"pudding-koerper\"> <path d=\"M8.5 30.5 10.8 16h14.4l2.3 14.5z\" fill=\"url(#p-flan)\"/> <path d=\"M10.8 16h14.4l-.7 3.8c-1.6 1.2-2.9-.4-4 .4s-2.4-.7-3.6 0-2.7.8-4.3-.3z\" fill=\"#9A522D\"/> <path d=\"M12 21c-.4 3-.6 6-.6 9\" stroke=\"#FFE9C2\" stroke-width=\"1.3\" stroke-linecap=\"round\" opacity=\".7\"/> <ellipse cx=\"18\" cy=\"14.8\" rx=\"6.6\" ry=\"3\" fill=\"#FFFDFB\"/><ellipse cx=\"16.6\" cy=\"14\" rx=\"2.6\" ry=\"1\" fill=\"#fff\"/> <circle cx=\"18\" cy=\"9.8\" r=\"3.1\" fill=\"#B3263A\"/><circle cx=\"17\" cy=\"8.9\" r=\".95\" fill=\"#fff\" opacity=\".75\"/> <path d=\"M18.2 6.8c.5-2.2 2.1-3.4 4-3.7\" stroke=\"#4A2328\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"/> </g> </svg>";
+const ROSENBLATT = ["<svg viewBox=\"0 0 24 26\" aria-hidden=\"true\"><defs><radialGradient id=\"r-0\" cx=\".4\" cy=\".35\" r=\".8\"><stop offset=\"0\" stop-color=\"#C24848\"/><stop offset=\"1\" stop-color=\"#6E1A22\"/></radialGradient></defs> <path d=\"M12 1.5C19 4 23 10 21 16c-2 6-6 8.5-9 8.5S5 22 3 16C1 10 5 4 12 1.5z\" fill=\"url(#r-0)\"/> <path d=\"M12 1.5C8 6 7 13 9 21\" stroke=\"rgba(255,255,255,.25)\" stroke-width=\"1.2\" fill=\"none\"/> <path d=\"M3 16c2 4 5 7 9 8.5\" stroke=\"rgba(0,0,0,.25)\" stroke-width=\"1.4\" fill=\"none\"/></svg>", "<svg viewBox=\"0 0 24 26\" aria-hidden=\"true\"><defs><radialGradient id=\"r-1\" cx=\".4\" cy=\".35\" r=\".8\"><stop offset=\"0\" stop-color=\"#B83A44\"/><stop offset=\"1\" stop-color=\"#5E141E\"/></radialGradient></defs> <path d=\"M12 1.5C19 4 23 10 21 16c-2 6-6 8.5-9 8.5S5 22 3 16C1 10 5 4 12 1.5z\" fill=\"url(#r-1)\"/> <path d=\"M12 1.5C8 6 7 13 9 21\" stroke=\"rgba(255,255,255,.25)\" stroke-width=\"1.2\" fill=\"none\"/> <path d=\"M3 16c2 4 5 7 9 8.5\" stroke=\"rgba(0,0,0,.25)\" stroke-width=\"1.4\" fill=\"none\"/></svg>", "<svg viewBox=\"0 0 24 26\" aria-hidden=\"true\"><defs><radialGradient id=\"r-2\" cx=\".4\" cy=\".35\" r=\".8\"><stop offset=\"0\" stop-color=\"#D98A6A\"/><stop offset=\"1\" stop-color=\"#8E2B2B\"/></radialGradient></defs> <path d=\"M12 1.5C19 4 23 10 21 16c-2 6-6 8.5-9 8.5S5 22 3 16C1 10 5 4 12 1.5z\" fill=\"url(#r-2)\"/> <path d=\"M12 1.5C8 6 7 13 9 21\" stroke=\"rgba(255,255,255,.25)\" stroke-width=\"1.2\" fill=\"none\"/> <path d=\"M3 16c2 4 5 7 9 8.5\" stroke=\"rgba(0,0,0,.25)\" stroke-width=\"1.4\" fill=\"none\"/></svg>", "<svg viewBox=\"0 0 24 26\" aria-hidden=\"true\"><defs><radialGradient id=\"r-3\" cx=\".4\" cy=\".35\" r=\".8\"><stop offset=\"0\" stop-color=\"#E2BE78\"/><stop offset=\"1\" stop-color=\"#A57A3A\"/></radialGradient></defs> <path d=\"M12 1.5C19 4 23 10 21 16c-2 6-6 8.5-9 8.5S5 22 3 16C1 10 5 4 12 1.5z\" fill=\"url(#r-3)\"/> <path d=\"M12 1.5C8 6 7 13 9 21\" stroke=\"rgba(255,255,255,.25)\" stroke-width=\"1.2\" fill=\"none\"/> <path d=\"M3 16c2 4 5 7 9 8.5\" stroke=\"rgba(0,0,0,.25)\" stroke-width=\"1.4\" fill=\"none\"/></svg>"];
 
-const hase = `
-  <svg viewBox="0 0 48 40" aria-hidden="true">
-    <ellipse cx="22" cy="28" rx="13" ry="9" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8"/>
-    <circle cx="35.5" cy="25.5" r="3.2" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8"/>
-    <g class="kopf">
-      <ellipse cx="12" cy="10" rx="2.6" ry="8" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8" transform="rotate(-12 12 10)"/>
-      <ellipse cx="12" cy="10" rx="1.2" ry="6" fill="#F6CDD2" transform="rotate(-12 12 10)"/>
-      <ellipse cx="17" cy="9.5" rx="2.6" ry="8" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8" transform="rotate(8 17 9.5)"/>
-      <circle cx="13" cy="21" r="7.5" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8"/>
-      <circle cx="10" cy="20" r="1.1" fill="#4B4038"/>
-      <ellipse cx="6.2" cy="22.5" rx="1.1" ry=".8" fill="#E8A9B3"/>
-      <ellipse cx="11" cy="23.8" rx="1.8" ry="1" fill="#F6CDD2" opacity=".7"/>
-      <path d="M18 18.5l2.5 1.6-2.4 1.2" fill="#D9A0A8"/>
-    </g>
-    <ellipse cx="14" cy="36" rx="4" ry="2" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8"/>
-    <ellipse cx="29" cy="36" rx="5" ry="2.2" fill="#FFFCF6" stroke="#E8D8CC" stroke-width=".8"/>
-  </svg>`;
-
-// Birma-Katze von der Seite (schaut nach links)
-const katze = `
-  <svg viewBox="0 0 70 48" aria-hidden="true">
-    <path class="schwanz" d="M52 26c8-2 12-10 9-17-1-2.5-3.5-1.5-3 .8 1.5 5-1.5 10-7.5 11.5z" fill="#6B4A3A"/>
-    <ellipse cx="37" cy="29" rx="17" ry="10.5" fill="#F6EBDD"/>
-    <ellipse cx="44" cy="26" rx="10" ry="7" fill="#EADBC8"/>
-    <g class="beine">
-      <rect x="24" y="34" width="5" height="11" rx="2.5" fill="#F6EBDD"/>
-      <rect x="31" y="34" width="5" height="11" rx="2.5" fill="#EADBC8"/>
-      <rect x="43" y="34" width="5" height="11" rx="2.5" fill="#F6EBDD"/>
-      <rect x="49" y="34" width="5" height="11" rx="2.5" fill="#EADBC8"/>
-      <ellipse cx="26.5" cy="45" rx="3" ry="1.5" fill="#fff"/><ellipse cx="45.5" cy="45" rx="3" ry="1.5" fill="#fff"/>
-    </g>
-    <g class="kopf">
-      <path d="M9 9l3 9 6-4zM25 7l-2 10-6-4z" fill="#6B4A3A"/>
-      <path d="M11 11.5l1.6 4.5 3-2zM23.3 10l-1 5-3-2z" fill="#E8B4A8"/>
-      <circle cx="17" cy="21" r="10.5" fill="#F6EBDD"/>
-      <ellipse cx="15" cy="23.5" rx="7" ry="6" fill="#8A6550" opacity=".75"/>
-      <ellipse cx="12" cy="20.5" rx="1.9" ry="2.3" fill="#5BA7E0"/><ellipse cx="19" cy="20.5" rx="1.9" ry="2.3" fill="#5BA7E0"/>
-      <ellipse cx="12" cy="20.8" rx=".7" ry="1.6" fill="#1F1A17"/><ellipse cx="19" cy="20.8" rx=".7" ry="1.6" fill="#1F1A17"/>
-      <path d="M14.6 25l1 1 1-1z" fill="#3B2A22"/>
-      <path class="mund" d="M15.6 26.2c-.6 1.2-1.8 1.4-2.6.8M15.6 26.2c.6 1.2 1.8 1.4 2.6.8" stroke="#3B2A22" stroke-width=".7" fill="none" stroke-linecap="round"/>
-      <path d="M8 24h-5M8 25.5l-4.5 1.5M23 24h5M23 25.5l4.5 1.5" stroke="#fff" stroke-width=".5" opacity=".8"/>
-    </g>
-  </svg>`;
-
-const pudding = `
-  <svg viewBox="0 0 32 32" aria-hidden="true">
-    <ellipse cx="16" cy="28" rx="13" ry="2.6" fill="#FFF8F3" stroke="#E7B9B4" stroke-width=".8"/>
-    <g class="pudding-koerper">
-      <path d="M7.5 27 9.6 14h12.8l2.1 13z" fill="#F2C27A"/>
-      <path d="M9.6 14h12.8l-.6 3.4c-1.5 1-2.6-.4-3.6.4s-2.2-.7-3.2 0-2.4.7-3.8-.3z" fill="#9A522D"/>
-      <ellipse cx="16" cy="13" rx="6" ry="2.8" fill="#FFF8F3"/>
-      <circle cx="16" cy="8.4" r="2.8" fill="#B3263A"/><circle cx="15.1" cy="7.6" r=".8" fill="#fff" opacity=".75"/>
-      <path d="M16.2 5.7c.5-2 1.9-3 3.6-3.3" stroke="#4A2328" stroke-width="1.1" fill="none" stroke-linecap="round"/>
-    </g>
-  </svg>`;
-
-// ---------- Szenen ----------
 export const SZENEN = {
-  // Zwei kleine Vögel fliegen über die Bögen
+  // Zwei Vögel fliegen mit Flügelschlag und Gleitphasen vorbei
   pastell: () => `
-    <div class="sz-vogel" style="--y:74px;--d:0s;--s:1">${vogel("#1F2E45")}</div>
-    <div class="sz-vogel" style="--y:112px;--d:.8s;--s:.7">${vogel("#4F7383")}</div>`,
+    <div class="sz-vogel" style="--y:70px;--d:0s;--s:1">${VOGEL}</div>
+    <div class="sz-vogel" style="--y:112px;--d:.9s;--s:.72">${VOGEL}</div>`,
 
-  // Ramune-Blasen steigen auf, eine Qualle schwebt durch
+  // Ramune-Blasen steigen auf, eine Qualle pulsiert nach oben
   melonsoda: () => {
-    let html = "";
-    for (let i = 0; i < 14; i++) {
-      html += `<span class="sz-blase" style="--x:${zufall(48, 96)}%;--d:${zufall(0, 3.2)}s;--g:${zufall(6, 16)}px;--w:${zufall(-14, 14)}px"></span>`;
+    let html = `<div class="sz-qualle">${QUALLE}</div>`;
+    for (let i = 0; i < 16; i++) {
+      html += `<span class="sz-blase" style="--x:${zufall(46, 96)}%;--d:${zufall(0, 3.4)}s;--g:${zufall(6, 17)}px;--w:${zufall(-14, 14)}px"></span>`;
     }
-    html += `<div class="sz-qualle"><svg viewBox="0 0 40 52" aria-hidden="true">
-      <path d="M4 20C4 9 11 3 20 3s16 6 16 17c-3 2-6-1-8 1-2-2-5 1-8-1-3 2-6-1-8 1-2-2-5 1-8-1z" fill="rgba(255,255,255,.75)" stroke="#5CC8B8" stroke-width="1"/>
-      <path d="M10 14c2-5 6-7 10-7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-      <g class="tentakel" stroke="#7FD4C8" stroke-width="1.3" fill="none" stroke-linecap="round">
-        <path d="M11 22c-2 6 2 10 0 16s1 9 0 12"/><path d="M17 22c-2 7 2 12 0 18"/><path d="M23 22c2 7-2 12 0 18"/><path d="M29 22c2 6-2 10 0 16s-1 9 0 12"/></g>
-      <circle cx="15" cy="15" r="1" fill="#22534A"/><circle cx="25" cy="15" r="1" fill="#22534A"/>
-      <ellipse cx="13" cy="17.5" rx="1.6" ry=".9" fill="#F6A6B2" opacity=".7"/><ellipse cx="27" cy="17.5" rx="1.6" ry=".9" fill="#F6A6B2" opacity=".7"/>
-    </svg></div>`;
     return html;
   },
 
-  // Ein Schmetterling flattert durch und hinterlässt Glitzer
+  // Schmetterling flattert durch und hinterlässt Glitzer
   feenglanz: () => {
-    let html = `<div class="sz-schmetterling">${schmetterling}</div>`;
+    let html = `<div class="sz-schmetterling">${SCHMETTERLING}</div>`;
     const farben = ["#F9A8D4", "#C4B5FD", "#7DD3FC", "#FDE68A", "#fff"];
     for (let i = 0; i < 9; i++) {
       const x = 90 - i * 11;
-      // Funken erscheinen ungefähr dort, wo der Schmetterling gerade vorbeifliegt
-      html += `<span class="sz-funke" style="--x:${x}%;--y:${zufall(80, 118)}px;--d:${(0.3 + ((105 - x) / 123) * 5.5).toFixed(2)}s">${funkeln(farben[i % farben.length])}</span>`;
+      html += `<span class="sz-funke" style="--x:${x}%;--y:${zufall(84, 124)}px;--d:${(0.35 + ((105 - x) / 125) * 6).toFixed(2)}s">${funkeln(farben[i % farben.length])}</span>`;
     }
     return html;
   },
 
-  // Fledermäuse fliegen am Mond vorbei
+  // Fledermäuse flattern am Mond vorbei
   brombeere: () => `
-    <div class="sz-fledermaus" style="--y:112px;--d:0s;--s:1">${fledermaus}</div>
-    <div class="sz-fledermaus" style="--y:146px;--d:.9s;--s:.7">${fledermaus}</div>
-    <div class="sz-fledermaus" style="--y:86px;--d:1.6s;--s:.55">${fledermaus}</div>`,
+    <div class="sz-fledermaus" style="--y:108px;--d:0s;--s:1">${FLEDERMAUS}</div>
+    <div class="sz-fledermaus" style="--y:142px;--d:1s;--s:.72">${FLEDERMAUS}</div>
+    <div class="sz-fledermaus" style="--y:84px;--d:1.8s;--s:.55">${FLEDERMAUS}</div>`,
 
   // Lichtstreifen von Schwebeautos + flackerndes Neon-Herz
   neon: () => `
@@ -150,26 +57,25 @@ export const SZENEN = {
       <path d="M20 33S3 23 3 12.5A8 8 0 0 1 20 9a8 8 0 0 1 17 3.5C37 23 20 33 20 33z" fill="none" stroke="#FF2E9F" stroke-width="2.4"/>
       <path d="M21.5 11 15 20h5l-1.8 7.5L25 17.5h-5.2z" fill="#29E2FF"/></svg></div>`,
 
-  // Rosenblätter fallen sanft
+  // Rosenblätter taumeln herab
   kerze: () => {
     let html = "";
-    const farben = ["#8E2B2B", "#A83A3A", "#C9A15B", "#7A1E2A", "#B04545", "#E2BE78", "#8E2B2B"];
-    for (let i = 0; i < 7; i++) {
-      html += `<span class="sz-blatt" style="--x:${zufall(46, 94)}%;--d:${(i * 0.7).toFixed(1)}s;--r:${zufall(-200, 200)}deg;--w:${zufall(-30, 30)}px">${blatt(farben[i])}</span>`;
+    for (let i = 0; i < 8; i++) {
+      html += `<span class="sz-blatt" style="--x:${zufall(44, 94)}%;--d:${(i * 0.65).toFixed(2)}s;--r:${zufall(-60, 60)}deg;--w:${zufall(-28, 28)}px">${ROSENBLATT[i % 4]}</span>`;
     }
     return html;
   },
 
-  // Ein Häschen hoppelt vorbei, Blümchen wachsen
+  // Ein Igel mit Gänseblümchen trippelt vorbei und schnuppert
   tee: () => `
-    <div class="sz-hase">${hase}</div>
-    <span class="sz-bluete" style="--x:62%;--d:2.2s">${funkeln("#E8A9B3")}</span>
-    <span class="sz-bluete" style="--x:74%;--d:2.6s">${funkeln("#A8B89A")}</span>
-    <span class="sz-bluete" style="--x:86%;--d:3s">${funkeln("#F2C94C")}</span>`,
+    <div class="sz-igel">${IGEL}</div>
+    <span class="sz-bluete" style="--x:60%;--d:2.4s">${funkeln("#E8A9B3")}</span>
+    <span class="sz-bluete" style="--x:72%;--d:2.8s">${funkeln("#A8B89A")}</span>
+    <span class="sz-bluete" style="--x:84%;--d:3.2s">${funkeln("#F2C94C")}</span>`,
 
-  // Eine Katze kommt von rechts, isst den Pudding und geht wieder
+  // Eine Katze kommt, frisst den Pudding und geht wieder
   pudding: () => `
-    <div class="sz-pudding">${pudding}</div>
-    <div class="sz-katze">${katze}</div>
-    <span class="sz-herz">${funkeln("#B3263A")}</span>`,
+    <div class="sz-pudding">${PUDDING}</div>
+    <div class="sz-katze">${KATZE}</div>
+    <span class="sz-herz"><svg viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21S1 14 1 7a5.5 5.5 0 0 1 11-1.5A5.5 5.5 0 0 1 23 7c0 7-11 14-11 14z" fill="#B3263A"/></svg></span>`,
 };
