@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline verfügbar.
 // Nach Änderungen an Dateien VERSION erhöhen, damit Handys das Update laden.
-const VERSION = "v11";
+const VERSION = "v12";
 const CACHE = "freundeskalender-" + VERSION;
 const DATEIEN = [
   "./",
