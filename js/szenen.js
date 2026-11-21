@@ -73,5 +73,5 @@ export const SZENEN = {
     <span class="sz-bluete" style="--x:84%;--d:3.2s">${funkeln("#F2C94C")}</span>`,
 
   // Ein Kätzchen im Bananenkostüm watschelt herein, macht den Scuba-Dance und geht wieder
-  pudding: () => `<div class="sz-banane">${BANANENKATZE}</div>`,
+  pudding: () => `<div class="sz-banane">${BANANENKATZE}<span class="sz-glanz"></span><img class="sz-echt" src="img/scuba-cat.webp" alt="" decoding="async"></div>`,
 };
