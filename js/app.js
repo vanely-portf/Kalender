@@ -677,9 +677,9 @@ async function antworten(id, antwort) {
 
 async function appTeilen() {
   const url = location.href.split("#")[0];
-  const text = "Plan mit uns im Freundeskalender! Trag ein, wann du Zeit hast 📅";
+  const text = "Plan mit uns im Friendlender! Trag ein, wann du Zeit hast 📅";
   if (navigator.share) {
-    try { await navigator.share({ title: "Freundeskalender", text, url }); return; }
+    try { await navigator.share({ title: "Friendlender", text, url }); return; }
     catch (e) { if (e.name === "AbortError") return; }
   }
   $("link-feld").value = url;

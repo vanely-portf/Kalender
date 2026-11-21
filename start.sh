@@ -1,6 +1,6 @@
 #!/bin/bash
 # ------------------------------------------------------------
-# Freundeskalender lokal starten
+# Friendlender lokal starten
 #   ./start.sh          -> startet auf Port 8080
 #   ./start.sh 3000     -> startet auf Port 3000
 # Beenden mit: ctrl + C
@@ -10,7 +10,7 @@ PORT="${1:-8080}"
 IP=$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}')
 
 echo ""
-echo "  📅  Freundeskalender läuft:"
+echo "  📅  Friendlender läuft:"
 echo "      Auf diesem Mac:   http://localhost:$PORT"
 [ -n "$IP" ] && echo "      Im gleichen WLAN: http://$IP:$PORT  (nur zum Ansehen, Installieren braucht HTTPS)"
 echo ""

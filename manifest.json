@@ -1,6 +1,6 @@
 {
-  "name": "Freundeskalender",
-  "short_name": "Kalender",
+  "name": "Friendlender",
+  "short_name": "Friendlender",
   "description": "Termine und Ferien im Freundeskreis gemeinsam planen.",
   "lang": "de",
   "start_url": "./index.html",

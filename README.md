@@ -1,4 +1,4 @@
-# Freundeskalender
+# Friendlender
 
 Mobile-first PWA, mit der ein Freundeskreis Termine und Ferien gemeinsam plant
 und sieht, an welchen Tagen möglichst viele Zeit haben.
