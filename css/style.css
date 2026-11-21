@@ -1067,6 +1067,78 @@ legend .ic, .antwort-zeile .ic, .gaeste > .ic { color: var(--akzent-text); margi
   75% { opacity: 1; transform: scale(1) rotate(90deg); } 100% { opacity: 0; transform: scale(.6) rotate(120deg); }
 }
 @keyframes blinzeln { 0%, 14% { transform: scaleY(1); } 15% { transform: scaleY(.1); } 16.5%, 66% { transform: scaleY(1); } 67% { transform: scaleY(.1); } 68.5%, 100% { transform: scaleY(1); } }
+
+/* ============================================================
+   Header-Hintergrund pro Design (dauerhaft, sehr ruhig)
+   ============================================================ */
+.hero-himmel { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.hero-himmel > * { position: absolute; display: block; }
+.hero-himmel svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+/* Wolken (Pretty Pastell) */
+.wolke { top: var(--y); left: 100%; width: var(--b); height: calc(var(--b) * .49); opacity: var(--wolke-o, .9); animation: wolke-zug var(--t) linear var(--d) infinite; }
+@keyframes wolke-zug { from { left: 100%; } to { left: calc(var(--b) * -1.2); } }
+
+/* Lichtstrahlen + Sprudel (Melon Soda) */
+.strahl { top: -30px; left: var(--x); width: var(--b); height: 280px; transform: skewX(-20deg); opacity: .15;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 80%);
+  animation: strahl var(--t) ease-in-out var(--d) infinite; }
+@keyframes strahl { 0%, 100% { opacity: .12; } 50% { opacity: .55; } }
+.sprudel { left: var(--x); top: 210px; width: var(--g); height: var(--g); border-radius: 50%; opacity: 0;
+  border: 1.2px solid rgba(255, 255, 255, .95); background: rgba(255, 255, 255, .25);
+  animation: sprudel var(--t) linear var(--d) infinite; }
+@keyframes sprudel { 0% { opacity: 0; transform: translate(0, 0); } 10% { opacity: .9; }
+  50% { transform: translate(var(--w), -110px); } 90% { opacity: .8; } 100% { opacity: 0; transform: translate(0, -220px); } }
+
+/* Funkelnde Sterne (Feenglanz, Brombeernacht) */
+.stern { left: var(--x); top: var(--y); width: var(--g); height: var(--g); opacity: .2; animation: stern var(--t) ease-in-out var(--d) infinite; }
+@keyframes stern { 0%, 100% { opacity: .15; transform: scale(.6) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(20deg); } }
+
+/* Weiche Lichtkugeln (Feenglanz, Neon, Kerzenschein) */
+.bokeh { left: var(--x); top: var(--y); width: var(--g); height: var(--g); border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, var(--f) 0, transparent 70%); animation: bokeh var(--t) ease-in-out var(--d) infinite; }
+@keyframes bokeh { 0%, 100% { opacity: 0; transform: translate(0, 0) scale(.8); } 50% { opacity: var(--o, .7); transform: translate(var(--w), -18px) scale(1.1); } }
+
+/* Neonregen (Neon Tokyo) */
+.regen { left: var(--x); top: -40px; width: 1.4px; height: 26px; opacity: .6;
+  background: linear-gradient(180deg, transparent, var(--f)); transform: rotate(14deg);
+  animation: regen var(--t) linear var(--d) infinite; }
+@keyframes regen { from { transform: translate(0, 0) rotate(14deg); } to { transform: translate(-70px, 300px) rotate(14deg); } }
+
+/* Pusteblumen-Samen (Teestunde) */
+.samen { left: 105%; top: var(--y); width: 18px; height: 24px; opacity: .9; animation: samen var(--t) ease-in-out var(--d) infinite; }
+@keyframes samen {
+  0% { left: 105%; transform: translateY(0) rotate(-10deg); } 25% { transform: translateY(-14px) rotate(8deg); }
+  50% { transform: translateY(6px) rotate(-6deg); } 75% { transform: translateY(-10px) rotate(10deg); }
+  100% { left: -10%; transform: translateY(0) rotate(-8deg); }
+}
+
+/* Aufsteigende Herzchen (Kirschpudding) */
+.herzlein { left: var(--x); top: 200px; width: var(--g); height: var(--g); opacity: 0; animation: herzlein var(--t) ease-in-out var(--d) infinite; }
+@keyframes herzlein { 0% { opacity: 0; transform: translate(0, 0) rotate(-10deg); } 15% { opacity: .9; }
+  50% { transform: translate(var(--w), -90px) rotate(10deg); } 85% { opacity: .8; } 100% { opacity: 0; transform: translate(0, -180px) rotate(-6deg); } }
+
+/* Schwebende Lichter (Pollen, Glühwürmchen, Staub) */
+.schwebe-licht { left: var(--x); top: var(--y); width: var(--g); height: var(--g); border-radius: 50%; opacity: 0;
+  background: var(--licht-farbe, #fff); box-shadow: 0 0 6px 1px var(--licht-farbe, #fff);
+  animation: schwebe-licht var(--t) ease-in-out var(--d) infinite; }
+@keyframes schwebe-licht { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: var(--licht-o, .8); }
+  50% { transform: translate(var(--w), -26px); } 80% { opacity: var(--licht-o, .8); } 100% { opacity: 0; transform: translate(calc(var(--w) * -.5), -52px); } }
+
+/* ============================================================
+   Gemalter Look: Papierstruktur, ruhigere Deko
+   ============================================================ */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .28 0 0 0 0 .2 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: var(--papier-o, .1); mix-blend-mode: var(--papier-blend, multiply);
+}
+[data-design="brombeere"], [data-design="neon"], [data-design="kerze"] { --papier-o: .16; --papier-blend: soft-light; }
+/* Die Bögen gehören zur Standard-Palette; die anderen Designs haben eigene Hintergründe */
+html:not([data-design="pastell"]) .hero::before,
+html:not([data-design="pastell"]) .hero::after,
+html:not([data-design="pastell"]) .hero-deko { display: none; }
+.hero-zeile, .gruss-unter { text-shadow: 0 1px 8px color-mix(in srgb, var(--hero-ende) 55%, transparent); }
 @keyframes igel-watscheln {
   0% { transform: rotate(0.0deg); }
   0.9% { transform: rotate(7.0deg); }

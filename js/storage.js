@@ -103,7 +103,8 @@ function firebaseBackend() {
       fs = await import(`https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-firestore.js`);
       const app = appMod.initializeApp(FIREBASE_CONFIG);
       db = fs.initializeFirestore(app, {
-        localCache: fs.persistentLocalCache(), // offline nutzbar
+        // Offline nutzbar – auch wenn die App in mehreren Tabs/Fenstern gleichzeitig offen ist
+        localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }),
       });
       fs.onSnapshot(fs.collection(db, ...pfad("personen")), { includeMetadataChanges: true }, (snap) => {
         zustand.personen = snap.docs.map((d) => ({ ...d.data(), id: d.id }));

@@ -1,63 +1,67 @@
 # Freundeskalender
 
-Mobile-first PWA, mit der ein Freundeskreis Termine und Ferien gemeinsam plant.
+Mobile-first PWA, mit der ein Freundeskreis Termine und Ferien gemeinsam plant
+und sieht, an welchen Tagen möglichst viele Zeit haben.
 Reines HTML/CSS/JavaScript, kein Build-Tool, kein eigener Server.
 
-## Im Terminal bedienen
+## Lokal starten (Terminal)
 
 ```bash
-cd ~/freundes-kalender     # in den Projektordner wechseln
-./start.sh                 # App starten (öffnet http://localhost:8080)
-./start.sh 3000            # auf einem anderen Port starten
-# ctrl + C                 # App beenden
+cd ~/Documents/GitHub/Kalender
+./start.sh            # öffnet http://localhost:8080
+./start.sh 3000       # anderer Port
+# ctrl + C            # beenden
 ```
 
-Alternativ, wenn Node.js installiert ist: `npm start`
+Falls `./start.sh` „permission denied“ meldet: einmal `chmod +x start.sh`.
+Alternativ in VS Code mit der Erweiterung *Live Server*.
 
-Falls `./start.sh` "permission denied" meldet: einmal `chmod +x start.sh` ausführen.
+## Online stellen
+
+GitHub Desktop → **Commit to main** → **Push origin**.
+Vercel ist mit dem Repository verbunden und veröffentlicht automatisch in etwa einer Minute.
+
+Nach jeder Änderung in `service-worker.js` die `VERSION` erhöhen, damit Handys die neue Version laden.
 
 ## Dateien
 
 | Datei | Inhalt |
 |---|---|
-| `index.html` | Grundgerüst: Kalender, Liste, beste Tage, Legende, Dialoge |
-| `css/style.css` | Gestaltung (mobile-first) |
-| `js/app.js` | Oberfläche, Klicks, Formulare, Fehlermeldungen |
-| `js/calendar.js` | Datum, Status-Farben, Verfügbarkeit, Monatsraster |
-| `js/storage.js` | Speichern: Firebase (gemeinsam) oder lokal |
-| `js/config.js` | Firebase-Zugangsdaten |
-| `manifest.json`, `service-worker.js` | PWA (installierbar, offline) |
-| `start.sh` | Lokaler Start aus dem Terminal |
+| `index.html` | Grundgerüst: Header, Kalender, Listen, Legende, alle Dialoge, Pinsel-Filter |
+| `css/style.css` | Gestaltung, 8 Designs als CSS-Variablen, Animationen |
+| `js/app.js` | Oberfläche, Profil, Einträge, Scroll-Räder, Einladungen |
+| `js/calendar.js` | Status, Datum, Verfügbarkeit, Monatsraster, beste Tage |
+| `js/storage.js` | Daten: Firebase Firestore (gemeinsam, live) oder lokal |
+| `js/config.js` | Firebase-Konfiguration + Gruppenname |
+| `js/designs.js` | Liste der Designs (Name, Farben, Schriften) |
+| `js/icons.js` | Eigene SVG-Icons (Bedienung, Status, Theme-Symbole) |
+| `js/szenen.js` | Header-Animationen + Header-Hintergründe (aus Generator erzeugt) |
+| `manifest.json`, `service-worker.js` | PWA: installierbar, offline |
+| `icons/` | App-Icons |
+| `start.sh`, `package.json` | Lokaler Start |
 
-## Lokaler Modus vs. gemeinsamer Kalender
+## Daten (Firebase)
 
-Ohne Konfiguration speichert die App nur auf dem eigenen Gerät (zum Testen).
-Damit alle Freunde dieselben Einträge sehen:
+Projekt `friendlender`, Firestore in `europe-west6` (Zürich), kostenloser Spark-Tarif.
+Pfad: `gruppen/freundeskreis/personen` und `gruppen/freundeskreis/eintraege`.
 
-1. Auf https://console.firebase.google.com ein Projekt anlegen (kostenlos).
-2. **Firestore Database** → *Datenbank erstellen* → Standort `europe-west6` (Zürich).
-3. Unter **Regeln** einfügen und veröffentlichen (jeder mit dem Link darf lesen/schreiben – passend für einen Freundeskreis ohne Login):
-   ```
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /gruppen/{gruppe}/{sammlung}/{id} {
-         allow read, write: if true;
-       }
-     }
-   }
-   ```
-4. **Projekteinstellungen** → *Meine Apps* → Web-App `</>` hinzufügen → die `firebaseConfig` kopieren.
-5. In `js/config.js` `FIREBASE_CONFIG = null` durch die kopierten Werte ersetzen.
+Regeln (in der Firebase-Konsole):
 
-## Online stellen (damit die Freunde die App installieren können)
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /gruppen/{gruppe}/{sammlung}/{id} {
+      allow read, write: if true;
+    }
+  }
+}
+```
 
-Eine PWA lässt sich nur über HTTPS installieren. Am einfachsten:
+Es gibt kein Login: Wer den Link hat, kann mitlesen und mitschreiben. Teile ihn nur im Freundeskreis.
+Ein Profil pro Gerät; jede Person kann ihr eigenes Profil samt Einträgen löschen.
 
-- **Netlify Drop:** https://app.netlify.com/drop öffnen und den Ordner `freundes-kalender` hineinziehen.
-- **GitHub Pages:** Ordner als Repository hochladen → Settings → Pages → Branch `main`.
+## Auf dem Handy installieren
 
-Danach den Link teilen. Auf dem iPhone: Safari → Teilen → *Zum Home-Bildschirm*.
-Auf Android: Chrome → Menü → *App installieren*.
-
-Nach Änderungen an den Dateien in `service-worker.js` die `VERSION` erhöhen (z. B. `v2`).
+- **iPhone:** Link in Safari öffnen → Teilen → *Zum Home-Bildschirm*
+- **Android:** Link in Chrome öffnen → Menü → *App installieren*
