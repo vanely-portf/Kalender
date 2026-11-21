@@ -423,3 +423,11 @@ input[readonly]:focus { border-color: var(--linie); box-shadow: none; }
 .mini-btn.nein { border: 1.5px solid var(--rot-hell); }
 .mini-btn.sicher, .sek-btn.sicher { background: var(--rot); color: #fff; border-color: var(--rot); animation: plopp-chip .3s var(--federnd); }
 .mini-btn:disabled, .sek-btn:disabled { opacity: .45; cursor: default; }
+
+.loeschen-link {
+  justify-self: center; background: none; border: 0; border-radius: 12px;
+  color: var(--rot); font-weight: 700; font-size: .85rem; padding: .55rem .9rem;
+}
+.loeschen-link:hover { background: var(--rot-hell); }
+.loeschen-link.sicher { background: var(--rot); color: #fff; animation: plopp-chip .3s var(--federnd); }
+.loeschen-link:disabled { opacity: .5; }

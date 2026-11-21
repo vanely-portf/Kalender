@@ -252,7 +252,7 @@ function profilOeffnen() {
   input.readOnly = vorhanden;
   $("profil-titel").textContent = vorhanden ? "Dein Profil 🎨" : "Wer bist du? 👋";
   $("profil-hinweis").textContent = vorhanden
-    ? "Dein Name ist mit diesem Gerät verbunden und kann nicht geändert werden. Die Farbe kannst du anpassen."
+    ? "Dein Name ist mit diesem Gerät verbunden. Die Farbe kannst du anpassen – oder das Profil ganz löschen."
     : "Pro Gerät gibt es ein Profil. Wähle deinen richtigen Namen.";
   const vergebenFarben = new Set(app.personen.filter((p) => p.id !== GERAET_ID).map((p) => p.farbe));
   const aktiv = app.ich?.farbe || FARBEN.find((f) => !vergebenFarben.has(f)) || FARBEN[0];
@@ -261,6 +261,9 @@ function profilOeffnen() {
   ).join("");
   $("profil-fehler").textContent = "";
   $("profil-abbrechen").hidden = !vorhanden;
+  $("profil-loeschen").hidden = !vorhanden;
+  $("profil-loeschen").classList.remove("sicher");
+  $("profil-loeschen").textContent = "🗑 Mein Profil und alle meine Einträge löschen";
   $("profil-dialog").showModal();
 }
 
@@ -293,6 +296,51 @@ async function profilSpeichern(ev) {
   } catch (e) {
     console.error(e);
     fehler.textContent = "Speichern fehlgeschlagen. Bitte erneut versuchen.";
+  }
+}
+
+/** Eigenes Profil samt allen eigenen Einträgen löschen (zweimal tippen) */
+async function profilLoeschen() {
+  const knopf = $("profil-loeschen");
+  if (!app.ich) return;
+  const ich = app.ich;
+  const meine = app.eintraege.filter((e) => e.name === ich.name);
+  if (!knopf.classList.contains("sicher")) {
+    knopf.classList.add("sicher");
+    knopf.textContent = meine.length
+      ? `Wirklich löschen? Auch ${meine.length} ${meine.length === 1 ? "Eintrag" : "Einträge"} – nochmals tippen`
+      : "Wirklich löschen? Nochmals tippen";
+    setTimeout(() => {
+      if (!knopf.classList.contains("sicher")) return;
+      knopf.classList.remove("sicher");
+      knopf.textContent = "🗑 Mein Profil und alle meine Einträge löschen";
+    }, 4000);
+    return;
+  }
+  knopf.disabled = true;
+  // Zuerst lokal abmelden, damit der Abgleich das Löschen nicht als "entfernt" meldet
+  app.ich = null;
+  profilMerken();
+  try {
+    for (const e of meine) await daten.eintragLoeschen(e.id);
+    // Aus Einladungen anderer Einträge austragen
+    for (const e of app.eintraege.filter((x) => x.name !== ich.name && (x.eingeladen || []).includes(ich.name))) {
+      const antworten = { ...(e.antworten || {}) };
+      delete antworten[ich.name];
+      await daten.eintragSpeichern({ ...e, eingeladen: e.eingeladen.filter((n) => n !== ich.name), antworten });
+    }
+    await daten.personLoeschen(ich.id);
+    $("profil-dialog").close();
+    toast("Profil gelöscht ✓");
+    render();
+    setTimeout(profilOeffnen, 600);
+  } catch (e) {
+    console.error(e);
+    app.ich = ich;
+    profilMerken();
+    toast("Löschen fehlgeschlagen. Bitte erneut versuchen.", true);
+  } finally {
+    knopf.disabled = false;
   }
 }
 
@@ -571,6 +619,7 @@ function ereignisse() {
 
   // Profil
   $("profil-btn").onclick = profilOeffnen;
+  $("profil-loeschen").onclick = profilLoeschen;
 
   $("profil-form").onsubmit = profilSpeichern;
   $("profil-abbrechen").onclick = () => $("profil-dialog").close();
