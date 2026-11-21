@@ -28,3 +28,6 @@ export const FIREBASE_CONFIG = {
 
 // Name der "Gruppe" – erlaubt mehrere Freundeskreise im selben Firebase-Projekt.
 export const GRUPPE = "freundeskreis";
+
+// Öffentlicher Schlüssel für Push-Benachrichtigungen (der geheime Teil liegt nur in Vercel).
+export const VAPID_PUBLIC_KEY = "BHRRWUAYkhJbP2XiGkMV46f4Qg3pvfQ-8LopmDQP9QA7HRlLYs9NDkrw4qJcy8-oryYSd608q8EhCOw7RkUAtVI";

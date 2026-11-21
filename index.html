@@ -51,6 +51,19 @@
   <main>
     <div id="modus-hinweis" class="hinweis" hidden></div>
 
+    <!-- Hinweis: Benachrichtigungen aktivieren -->
+    <section id="push-hinweis" class="karte push-hinweis" hidden>
+      <span class="push-ikon" data-icon="glocke" aria-hidden="true"></span>
+      <div class="push-text">
+        <strong>Nichts verpassen</strong>
+        <span>Erhalte eine Nachricht, wenn dich jemand einlädt oder zusagt.</span>
+      </div>
+      <div class="push-knoepfe">
+        <button id="push-spaeter" type="button" class="sek-btn">Später</button>
+        <button id="push-ja" type="button" class="primaer-btn">Aktivieren</button>
+      </div>
+    </section>
+
     <!-- Kalender -->
     <section class="karte kalender" id="kalender-karte">
       <span class="kal-deko gross" id="kal-deko-1" aria-hidden="true"></span>
@@ -124,6 +137,11 @@
         <legend>Kalender-Design</legend>
         <div id="design-auswahl" class="designs"></div>
         <p class="klein-hinweis" style="margin-top:.5rem">Das Design gilt nur auf diesem Gerät – deine Freunde sehen ihr eigenes.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Benachrichtigungen</legend>
+        <button id="push-btn" type="button" class="sek-btn push-btn" hidden></button>
+        <p id="push-info" class="klein-hinweis" style="margin-top:.5rem" hidden></p>
       </fieldset>
       <p id="profil-fehler" class="fehler" role="alert"></p>
       <div class="aktionen">

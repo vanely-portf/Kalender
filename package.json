@@ -6,5 +6,8 @@
   "scripts": {
     "start": "sh start.sh",
     "dev": "sh start.sh"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
   }
 }

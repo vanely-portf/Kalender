@@ -29,7 +29,8 @@ Nach jeder Änderung in `service-worker.js` die `VERSION` erhöhen, damit Handys
 |---|---|
 | `index.html` | Grundgerüst: Header, Kalender, Listen, Legende, alle Dialoge, Pinsel-Filter |
 | `css/style.css` | Gestaltung, 8 Designs als CSS-Variablen, Animationen |
-| `js/app.js` | Oberfläche, Profil, Einträge, Scroll-Räder, Einladungen |
+| `js/app.js` | Oberfläche, Profil, Einträge, Scroll-Räder, Einladungen, Benachrichtigungen |
+| `api/push.js` | Vercel-Funktion: verschickt die Push-Benachrichtigungen |
 | `js/calendar.js` | Status, Datum, Verfügbarkeit, Monatsraster, beste Tage |
 | `js/storage.js` | Daten: Firebase Firestore (gemeinsam, live) oder lokal |
 | `js/config.js` | Firebase-Konfiguration + Gruppenname |
@@ -60,6 +61,19 @@ service cloud.firestore {
 
 Es gibt kein Login: Wer den Link hat, kann mitlesen und mitschreiben. Teile ihn nur im Freundeskreis.
 Ein Profil pro Gerät; jede Person kann ihr eigenes Profil samt Einträgen löschen.
+
+## Benachrichtigungen (Push)
+
+Wer eingeladen wird, bekommt eine Benachrichtigung – und wer einlädt, bekommt eine, sobald jemand zusagt.
+Das funktioniert auch bei geschlossener App und kostet nichts:
+
+- Versand über die Vercel-Funktion `api/push.js` (Hobby-Tarif, gratis) mit der Bibliothek `web-push`.
+- Die Anmeldung jedes Geräts liegt in Firestore unter `gruppen/freundeskreis/push/{Geräte-ID}`.
+- Der öffentliche Schlüssel steht in `js/config.js` und `api/push.js`.
+- Der **geheime Schlüssel** gehört nur in Vercel: *Settings → Environment Variables →* `VAPID_PRIVATE_KEY`.
+  Nie ins GitHub-Repo schreiben.
+- Aktivieren: Hinweis-Karte auf der Startseite oder im Profil „Benachrichtigungen aktivieren“.
+- **iPhone:** nur möglich, wenn die App über Teilen → *Zum Home-Bildschirm* installiert ist (ab iOS 16.4).
 
 ## Auf dem Handy installieren
 

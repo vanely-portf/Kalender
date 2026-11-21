@@ -90,6 +90,8 @@ const lokal = {
     zustand.personen = zustand.personen.filter((x) => x.id !== id);
     lokalSichern(); melden();
   },
+  async pushSpeichern() {},
+  async pushLoeschen() {},
 };
 
 // ---------- Firebase-Modus ----------
@@ -132,6 +134,13 @@ function firebaseBackend() {
     async personLoeschen(id) {
       await fs.deleteDoc(fs.doc(db, ...pfad("personen"), id));
     },
+    // Push-Anmeldung pro Gerät (eigene Sammlung, damit das Profil-Dokument schlank bleibt)
+    async pushSpeichern(id, abo) {
+      await fs.setDoc(fs.doc(db, ...pfad("push"), id), { abo, aktualisiert: Date.now() });
+    },
+    async pushLoeschen(id) {
+      await fs.deleteDoc(fs.doc(db, ...pfad("push"), id));
+    },
   };
 }
 
@@ -172,4 +181,12 @@ export async function eintragLoeschen(id) {
 /** Antwort auf eine Einladung: "ja" oder "nein" */
 export async function antwortSpeichern(id, name, antwort) {
   await backend.antwortSpeichern(id, name, antwort);
+}
+
+/** Push-Anmeldung dieses Geräts speichern bzw. entfernen */
+export async function pushSpeichern(id, abo) {
+  await backend.pushSpeichern(id, abo);
+}
+export async function pushLoeschen(id) {
+  await backend.pushLoeschen(id);
 }

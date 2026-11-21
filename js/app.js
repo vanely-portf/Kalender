@@ -2,6 +2,7 @@
 // App: Oberfläche, Ereignisse, Formulare, Prüfungen
 // ------------------------------------------------------------
 import * as daten from "./storage.js";
+import { VAPID_PUBLIC_KEY } from "./config.js";
 import { DESIGNS, aktuellesDesign, designAnwenden } from "./designs.js";
 import { ICON, THEME_ICON, MINI_DEKO, statusIcon } from "./icons.js";
 import { SZENEN, HIMMEL } from "./szenen.js";
@@ -316,6 +317,7 @@ function profilOeffnen() {
   $("profil-loeschen").hidden = !vorhanden;
   $("profil-loeschen").classList.remove("sicher");
   $("profil-loeschen").innerHTML = `${ICON.loeschen} Mein Profil und alle meine Einträge löschen`;
+  pushAnzeigen();
   $("profil-dialog").showModal();
 }
 
@@ -343,6 +345,7 @@ async function profilSpeichern(ev) {
     profilMerken();
     $("profil-dialog").close();
     toast(neu ? `Willkommen, ${name}!` : "Gespeichert ✓");
+    pushAnzeigen();
     if (neu) konfetti();
     render();
   } catch (e) {
@@ -382,6 +385,7 @@ async function profilLoeschen() {
       await daten.eintragSpeichern({ ...e, eingeladen: e.eingeladen.filter((n) => n !== ich.name), antworten });
     }
     await daten.personLoeschen(ich.id);
+    await daten.pushLoeschen(ich.id).catch(() => {});
     $("profil-dialog").close();
     toast("Profil gelöscht ✓");
     render();
@@ -482,8 +486,9 @@ async function eintragSpeichern(ev) {
   const antworten = Object.fromEntries(
     Object.entries(alt?.antworten || {}).filter(([n]) => eingeladen.includes(n))
   );
+  const neuEingeladen = eingeladen.filter((n) => !(alt?.eingeladen || []).includes(n));
   try {
-    await daten.eintragSpeichern({
+    const gespeichert = await daten.eintragSpeichern({
       id: app.bearbeiteId || undefined,
       erstellt: alt?.erstellt,
       name: app.ich.name,
@@ -495,6 +500,7 @@ async function eintragSpeichern(ev) {
       antworten,
     });
     $("eintrag-dialog").close();
+    if (neuEingeladen.length) benachrichtigen({ art: "einladung", eintrag: gespeichert.id, an: neuEingeladen });
     toast(eingeladen.length ? `Gespeichert ✓ ${eingeladen.length} eingeladen` : "Gespeichert ✓");
     konfetti();
   } catch (e) {
@@ -667,12 +673,103 @@ function einladungPruefen() {
 async function antworten(id, antwort) {
   try {
     await daten.antwortSpeichern(id, app.ich.name, antwort);
-    if (antwort === "ja") { toast("Zugesagt ✓"); konfetti(); }
+    if (antwort === "ja") { toast("Zugesagt ✓"); konfetti(); benachrichtigen({ art: "antwort", eintrag: id, von: app.ich.name }); }
     else toast("Abgesagt");
   } catch (e) {
     console.error(e);
     toast("Antwort konnte nicht gespeichert werden.", true);
   }
+}
+
+// ---------- Push-Benachrichtigungen ----------
+// Einladungen und Zusagen kommen als Benachrichtigung aufs Handy – auch wenn die App zu ist.
+// Der Versand läuft über die Vercel-Funktion /api/push (gratis, ohne Abo).
+const PUSH_SPAETER = "fk-push-spaeter";
+const istIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const istInstalliert = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+
+function pushMoeglich() {
+  return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+}
+
+function schluesselBytes(b64) {
+  const pad = "=".repeat((4 - (b64.length % 4)) % 4);
+  const roh = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
+  return Uint8Array.from(roh, (c) => c.charCodeAt(0));
+}
+
+async function pushAnmelden() {
+  const reg = await navigator.serviceWorker.ready;
+  let abo = await reg.pushManager.getSubscription();
+  if (!abo) abo = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: schluesselBytes(VAPID_PUBLIC_KEY) });
+  if (app.ich) await daten.pushSpeichern(app.ich.id, JSON.parse(JSON.stringify(abo)));
+}
+
+async function pushAktivieren() {
+  if (!pushMoeglich()) {
+    toast(istIos && !istInstalliert ? "Auf dem iPhone zuerst „Zum Home-Bildschirm“ hinzufügen" : "Dieses Gerät unterstützt keine Benachrichtigungen", true);
+    return;
+  }
+  try {
+    const erlaubnis = await Notification.requestPermission();
+    if (erlaubnis !== "granted") {
+      toast("Benachrichtigungen wurden nicht erlaubt", true);
+    } else {
+      await pushAnmelden();
+      toast("Benachrichtigungen aktiviert ✓");
+    }
+  } catch (e) {
+    console.error(e);
+    toast("Benachrichtigungen konnten nicht aktiviert werden", true);
+  }
+  pushAnzeigen();
+}
+
+async function pushAusschalten() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const abo = await reg.pushManager.getSubscription();
+    if (abo) await abo.unsubscribe();
+    if (app.ich) await daten.pushLoeschen(app.ich.id);
+    localStorage.setItem(PUSH_SPAETER, "1");
+    toast("Benachrichtigungen ausgeschaltet");
+  } catch (e) { console.error(e); }
+  pushAnzeigen();
+}
+
+// Bei jedem Start die Anmeldung auffrischen (Abos können sich ändern)
+async function pushAuffrischen() {
+  if (!pushMoeglich() || !daten.istGemeinsam() || !app.ich || Notification.permission !== "granted") return;
+  try { await pushAnmelden(); } catch (e) { console.warn("Push:", e); }
+}
+
+async function pushAnzeigen() {
+  const knopf = $("push-btn"), info = $("push-info"), hinweis = $("push-hinweis");
+  let an = false;
+  if (pushMoeglich() && Notification.permission === "granted") {
+    try { an = !!(await (await navigator.serviceWorker.ready).pushManager.getSubscription()); } catch {}
+  }
+  if (knopf) {
+    knopf.hidden = !app.ich;
+    knopf.classList.toggle("an", an);
+    knopf.innerHTML = `${ICON.glocke} ${an ? "Benachrichtigungen sind an" : "Benachrichtigungen aktivieren"}`;
+    info.textContent = !pushMoeglich()
+      ? (istIos && !istInstalliert ? "Auf dem iPhone funktionieren Benachrichtigungen nur, wenn die App über Teilen → „Zum Home-Bildschirm“ installiert ist." : "Dieser Browser unterstützt keine Benachrichtigungen.")
+      : Notification.permission === "denied"
+        ? "Benachrichtigungen sind blockiert. Du kannst sie in den Einstellungen deines Handys für diese App erlauben."
+        : an ? "Du wirst benachrichtigt, wenn dich jemand einlädt oder deine Einladung annimmt. Tippen zum Ausschalten."
+             : "Erhalte eine Nachricht, wenn dich jemand einlädt oder deine Einladung annimmt.";
+    info.hidden = !app.ich;
+  }
+  if (hinweis) {
+    hinweis.hidden = !(app.ich && daten.istGemeinsam() && pushMoeglich() && Notification.permission === "default" && !localStorage.getItem(PUSH_SPAETER));
+  }
+}
+
+function benachrichtigen(daten_) {
+  if (!daten.istGemeinsam()) return;
+  fetch("api/push", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(daten_), keepalive: true })
+    .catch((e) => console.warn("Push:", e));
 }
 
 async function appTeilen() {
@@ -762,6 +859,12 @@ function ereignisse() {
     }
     freundeChipsRendern();
   };
+  $("push-btn").onclick = async () => {
+    const an = $("push-btn").classList.contains("an");
+    if (an) await pushAusschalten(); else await pushAktivieren();
+  };
+  $("push-ja").onclick = () => pushAktivieren();
+  $("push-spaeter").onclick = () => { localStorage.setItem(PUSH_SPAETER, "1"); pushAnzeigen(); };
   $("einladung-ja").onclick = () => { $("einladung-dialog").close(); antworten(app.offeneEinladung, "ja"); };
   $("einladung-nein").onclick = () => { $("einladung-dialog").close(); antworten(app.offeneEinladung, "nein"); };
   $("einladung-spaeter").onclick = () => {
@@ -846,6 +949,8 @@ async function start() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js").catch((e) => console.warn("SW:", e));
   }
+  pushAnzeigen();
+  pushAuffrischen();
 }
 
 start();

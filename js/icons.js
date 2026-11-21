@@ -25,6 +25,7 @@ export const ICON = {
   kalender: linie('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
   leute: linie('<circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.3a6.5 6.5 0 0 1 3.5 5.7"/>'),
   brief: linie('<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m3.5 7 8.5 6.5L20.5 7"/>'),
+  glocke: linie('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
   plus: linie('<path d="M12 5v14M5 12h14"/>'),
   haken: linie('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
   kreuz: linie('<path d="M7 7l10 10M17 7 7 17"/>'),
