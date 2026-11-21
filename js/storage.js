@@ -2,7 +2,8 @@
 // Datenspeicher: Firebase Firestore (gemeinsam) oder localStorage (lokal)
 // ------------------------------------------------------------
 // Datenmodell
-//   Person:  { id, name, farbe }
+//   Person:  { id (= Geräte-ID), name, farbe, geraet: true }
+//   Einstellung (z. B. Admin-PIN): gruppen/<gruppe>/einstellungen/<key>
 //   Eintrag: { id, name, start: "YYYY-MM-DD", ende: "YYYY-MM-DD",
 //              status, von: "HH:MM" | "", bis: "HH:MM" | "", notiz, erstellt }
 
@@ -12,16 +13,20 @@ const FB_VERSION = "10.12.2";
 const LS_KEY = "fk-daten-" + GRUPPE;
 
 let backend = null;
-const zustand = { personen: [], eintraege: [] };
+const zustand = { personen: [], eintraege: [], personenVomServer: false };
 const zuhoerer = new Set();
 
+function momentaufnahme() {
+  return { personen: [...zustand.personen], eintraege: [...zustand.eintraege], vomServer: zustand.personenVomServer };
+}
+
 function melden() {
-  zuhoerer.forEach((fn) => fn({ personen: [...zustand.personen], eintraege: [...zustand.eintraege] }));
+  zuhoerer.forEach((fn) => fn(momentaufnahme()));
 }
 
 export function abonnieren(fn) {
   zuhoerer.add(fn);
-  fn({ personen: [...zustand.personen], eintraege: [...zustand.eintraege] });
+  fn(momentaufnahme());
   return () => zuhoerer.delete(fn);
 }
 
@@ -56,6 +61,7 @@ const lokal = {
   art: "lokal",
   async start() {
     lokalLaden();
+    zustand.personenVomServer = true;
     window.addEventListener("storage", (e) => {
       if (e.key === LS_KEY) { lokalLaden(); melden(); }
     });
@@ -81,6 +87,16 @@ const lokal = {
     e.antworten = { ...(e.antworten || {}), [name]: antwort };
     lokalSichern(); melden();
   },
+  async personLoeschen(id) {
+    zustand.personen = zustand.personen.filter((x) => x.id !== id);
+    lokalSichern(); melden();
+  },
+  async einstellungLesen(key) {
+    try { return JSON.parse(localStorage.getItem(LS_KEY + "-einst-" + key)); } catch { return null; }
+  },
+  async einstellungSpeichern(key, wert) {
+    localStorage.setItem(LS_KEY + "-einst-" + key, JSON.stringify(wert));
+  },
 };
 
 // ---------- Firebase-Modus ----------
@@ -96,8 +112,9 @@ function firebaseBackend() {
       db = fs.initializeFirestore(app, {
         localCache: fs.persistentLocalCache(), // offline nutzbar
       });
-      fs.onSnapshot(fs.collection(db, ...pfad("personen")), (snap) => {
-        zustand.personen = snap.docs.map((d) => d.data());
+      fs.onSnapshot(fs.collection(db, ...pfad("personen")), { includeMetadataChanges: true }, (snap) => {
+        zustand.personen = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+        zustand.personenVomServer = !snap.metadata.fromCache;
         melden();
       });
       fs.onSnapshot(fs.collection(db, ...pfad("eintraege")), (snap) => {
@@ -118,6 +135,16 @@ function firebaseBackend() {
       // Nur das eine Feld ändern, damit gleichzeitige Antworten sich nicht überschreiben
       await fs.updateDoc(fs.doc(db, ...pfad("eintraege"), id), new fs.FieldPath("antworten", name), antwort);
     },
+    async personLoeschen(id) {
+      await fs.deleteDoc(fs.doc(db, ...pfad("personen"), id));
+    },
+    async einstellungLesen(key) {
+      const d = await fs.getDoc(fs.doc(db, ...pfad("einstellungen"), key));
+      return d.exists() ? d.data().wert : null;
+    },
+    async einstellungSpeichern(key, wert) {
+      await fs.setDoc(fs.doc(db, ...pfad("einstellungen"), key), { wert });
+    },
   };
 }
 
@@ -136,9 +163,21 @@ export async function starten() {
   await backend.start();
 }
 
-export async function personSpeichern({ name, farbe }) {
-  const id = name.trim().toLowerCase();
-  await backend.personSpeichern({ id, name: name.trim(), farbe });
+/** Profil speichern. id = Geräte-ID, damit pro Gerät genau ein Profil existiert. */
+export async function personSpeichern({ id, name, farbe }) {
+  await backend.personSpeichern({ id, name: name.trim(), farbe, geraet: true });
+}
+
+export async function personLoeschen(id) {
+  await backend.personLoeschen(id);
+}
+
+export async function einstellungLesen(key) {
+  return backend.einstellungLesen(key);
+}
+
+export async function einstellungSpeichern(key, wert) {
+  await backend.einstellungSpeichern(key, wert);
 }
 
 export async function eintragSpeichern(eintrag) {

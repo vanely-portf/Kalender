@@ -12,6 +12,20 @@ const FARBEN = ["#e5484d", "#f97316", "#eab308", "#22a55b", "#14b8a6",
 
 const $ = (id) => document.getElementById(id);
 const PROFIL_KEY = "fk-ich";
+const GERAET_KEY = "fk-geraet";
+const ADMIN_KEY = "fk-admin";
+
+// Jede Installation/jeder Browser bekommt eine feste Geräte-ID → genau ein Profil pro Gerät
+const GERAET_ID = (() => {
+  try {
+    let id = localStorage.getItem(GERAET_KEY);
+    if (!id) {
+      id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+      localStorage.setItem(GERAET_KEY, id);
+    }
+    return id;
+  } catch { return "geraet-" + Math.random().toString(36).slice(2); }
+})();
 
 const app = {
   jahr: new Date().getFullYear(),
@@ -29,7 +43,21 @@ const app = {
 
 // ---------- Hilfen ----------
 function ladeProfil() {
-  try { return JSON.parse(localStorage.getItem(PROFIL_KEY)); } catch { return null; }
+  try {
+    const p = JSON.parse(localStorage.getItem(PROFIL_KEY));
+    // Profile aus der Version vor "ein Profil pro Gerät" gelten nicht mehr → neu anmelden
+    if (p && !p.id) { localStorage.removeItem(PROFIL_KEY); return null; }
+    return p;
+  } catch { return null; }
+}
+function profilMerken() {
+  try {
+    if (app.ich) localStorage.setItem(PROFIL_KEY, JSON.stringify(app.ich));
+    else localStorage.removeItem(PROFIL_KEY);
+  } catch {}
+}
+function istAdmin() {
+  try { return sessionStorage.getItem(ADMIN_KEY) === "1"; } catch { return false; }
 }
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -127,6 +155,7 @@ function eintragHtml(e, mitDatum, i = 0) {
   const mehrtaegig = e.ende && e.ende !== e.start
     ? ` · ${datumKurz(e.start)} – ${datumKurz(e.ende)}` : "";
   const meins = app.ich && e.name === app.ich.name;
+  const admin = istAdmin();
   const eingeladen = e.eingeladen || [];
   const antworten = e.antworten || {};
   const ichEingeladen = app.ich && eingeladen.includes(app.ich.name);
@@ -155,9 +184,9 @@ function eintragHtml(e, mitDatum, i = 0) {
       </div>
       ${gaeste}${antwortKnoepfe}
     </div>
-    ${meins ? `<div class="eintrag-aktionen">
-      <button type="button" class="icon-btn" data-bearbeiten="${e.id}" aria-label="Bearbeiten">✎</button>
-      <button type="button" class="icon-btn" data-loeschen="${e.id}" aria-label="Löschen">🗑</button>
+    ${meins || admin ? `<div class="eintrag-aktionen">
+      ${meins ? `<button type="button" class="icon-btn" data-bearbeiten="${e.id}" aria-label="Bearbeiten">✎</button>` : ""}
+      <button type="button" class="icon-btn ${meins ? "" : "admin-loeschen"}" data-loeschen="${e.id}" aria-label="Löschen">🗑</button>
     </div>` : ""}
   </li>`;
 }
@@ -220,36 +249,225 @@ function renderLegende() {
 
 // ---------- Profil ----------
 function profilOeffnen() {
-  $("profil-input").value = app.ich?.name || "";
-  const aktiv = app.ich?.farbe || FARBEN[app.personen.length % FARBEN.length];
+  const vorhanden = !!app.ich;
+  const input = $("profil-input");
+  input.value = app.ich?.name || "";
+  // Ein Gerät = ein Profil: Name ist fest, nur die Farbe lässt sich ändern
+  input.readOnly = vorhanden;
+  $("profil-titel").textContent = vorhanden ? "Dein Profil 🎨" : "Wer bist du? 👋";
+  $("profil-hinweis").textContent = vorhanden
+    ? "Dein Name ist mit diesem Gerät verbunden. Ändern oder löschen kann ihn nur der Admin."
+    : "Pro Gerät gibt es ein Profil. Wähle deinen richtigen Namen.";
+  const vergebenFarben = new Set(app.personen.filter((p) => p.id !== GERAET_ID).map((p) => p.farbe));
+  const aktiv = app.ich?.farbe || FARBEN.find((f) => !vergebenFarben.has(f)) || FARBEN[0];
   $("farb-auswahl").innerHTML = FARBEN.map((f) =>
-    `<button type="button" class="farbe ${f === aktiv ? "aktiv" : ""}" data-farbe="${f}" style="background:${f}" aria-label="Farbe ${f}"></button>`
+    `<button type="button" class="farbe ${f === aktiv ? "aktiv" : ""} ${vergebenFarben.has(f) ? "vergeben" : ""}" data-farbe="${f}" style="background:${f}" aria-label="Farbe ${f}"></button>`
   ).join("");
   $("profil-fehler").textContent = "";
-  $("profil-abbrechen").hidden = !app.ich;
+  $("profil-abbrechen").hidden = !vorhanden;
   $("profil-dialog").showModal();
 }
 
 async function profilSpeichern(ev) {
   ev.preventDefault();
-  const name = $("profil-input").value.trim();
+  const neu = !app.ich;
+  const name = neu ? $("profil-input").value.trim() : app.ich.name;
   const farbe = $("farb-auswahl").querySelector(".aktiv")?.dataset.farbe;
-  if (!name) return ($("profil-fehler").textContent = "Bitte gib deinen Namen ein.");
-  if (!farbe) return ($("profil-fehler").textContent = "Bitte wähle eine Farbe.");
-  const vergeben = app.personen.find((p) => p.farbe === farbe && p.name !== name);
-  if (vergeben) return ($("profil-fehler").textContent = `Diese Farbe hat schon ${vergeben.name}. Bitte wähle eine andere.`);
+  const fehler = $("profil-fehler");
+  if (!name) return (fehler.textContent = "Bitte gib deinen Namen ein.");
+  if (!farbe) return (fehler.textContent = "Bitte wähle eine Farbe.");
+
+  const andere = app.personen.filter((p) => p.id !== GERAET_ID);
+  // Alte Profile (vor der Geräte-Version) mit gleichem Namen dürfen übernommen werden
+  const gleicherName = andere.find((p) => p.geraet && p.name.toLowerCase() === name.toLowerCase());
+  if (neu && gleicherName) {
+    return (fehler.textContent = `«${gleicherName.name}» gibt es schon auf einem anderen Gerät. Wähle einen anderen Namen oder bitte den Admin, das alte Profil zu löschen.`);
+  }
+  const farbeVergeben = andere.find((p) => p.farbe === farbe && p.name.toLowerCase() !== name.toLowerCase());
+  if (farbeVergeben) return (fehler.textContent = `Diese Farbe hat schon ${farbeVergeben.name}. Bitte wähle eine andere.`);
+
   try {
-    await daten.personSpeichern({ name, farbe });
-    app.ich = { name, farbe };
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(app.ich));
+    await daten.personSpeichern({ id: GERAET_ID, name, farbe });
+    app.ich = { id: GERAET_ID, name, farbe, bestaetigt: app.ich?.bestaetigt || false };
+    profilMerken();
     $("profil-dialog").close();
-    toast(`Willkommen, ${name}! 🎉`);
-    konfetti();
+    toast(neu ? `Willkommen, ${name}! 🎉` : "Farbe gespeichert ✓");
+    if (neu) konfetti();
     render();
   } catch (e) {
     console.error(e);
-    $("profil-fehler").textContent = "Speichern fehlgeschlagen. Bitte erneut versuchen.";
+    fehler.textContent = "Speichern fehlgeschlagen. Bitte erneut versuchen.";
   }
+}
+
+/** Abgleich des eigenen Profils mit der gemeinsamen Liste */
+function profilAbgleichen(personen, vomServer) {
+  if (!app.ich || !vomServer) return;
+  const meins = personen.find((p) => p.id === app.ich.id);
+  if (meins) {
+    app.ich.farbe = meins.farbe;
+    if (!app.ich.bestaetigt) { app.ich.bestaetigt = true; profilMerken(); }
+    // Eigene alte Profil-Einträge (aus der Zeit vor der Geräte-Version) aufräumen
+    personen.filter((p) => !p.geraet && p.id !== app.ich.id && p.name === app.ich.name)
+      .forEach((p) => daten.personLoeschen(p.id).catch(() => {}));
+    return;
+  }
+  if (app.ich.bestaetigt) {
+    // Profil war schon in der Liste und ist jetzt weg → vom Admin gelöscht
+    app.ich = null;
+    profilMerken();
+    toast("Dein Profil wurde vom Admin entfernt.", true);
+    if (!$("profil-dialog").open) profilOeffnen();
+  } else {
+    // Profil aus älterer Version: einmalig in die gemeinsame Liste übernehmen
+    daten.personSpeichern(app.ich).catch((e) => console.warn("Profil:", e));
+  }
+}
+
+// ---------- Admin ----------
+async function pinHash(pin) {
+  const daten_ = new TextEncoder().encode("freundeskalender:" + pin);
+  const h = await crypto.subtle.digest("SHA-256", daten_);
+  return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function adminOeffnen() {
+  $("admin-fehler").textContent = "";
+  $("admin-pin").value = "";
+  $("admin-pin2").value = "";
+  if (istAdmin()) {
+    adminRendern();
+    $("admin-gesperrt").hidden = true;
+    $("admin-offen").hidden = false;
+  } else {
+    $("admin-gesperrt").hidden = false;
+    $("admin-offen").hidden = true;
+    $("admin-text").textContent = "PIN wird geladen…";
+    $("admin-dialog").showModal();
+    try {
+      app.adminPinHash = await daten.einstellungLesen("adminPin");
+    } catch (e) {
+      console.error(e);
+      app.adminPinHash = undefined;
+    }
+    const ersteMal = !app.adminPinHash;
+    $("admin-pin2-feld").hidden = !ersteMal;
+    $("admin-text").textContent = ersteMal
+      ? "Noch keine Admin-PIN festgelegt. Lege jetzt eine fest (mind. 4 Zeichen) und merke sie dir gut."
+      : "Gib die Admin-PIN ein.";
+    $("admin-los").textContent = ersteMal ? "PIN festlegen" : "Entsperren";
+    setTimeout(() => $("admin-pin").focus(), 50);
+    return;
+  }
+  $("admin-dialog").showModal();
+}
+
+async function adminEntsperren(ev) {
+  ev.preventDefault();
+  const pin = $("admin-pin").value.trim();
+  const fehler = $("admin-fehler");
+  if (pin.length < 4) return (fehler.textContent = "Die PIN braucht mindestens 4 Zeichen.");
+  try {
+    const hash = await pinHash(pin);
+    if (!app.adminPinHash) {
+      if (pin !== $("admin-pin2").value.trim()) return (fehler.textContent = "Die beiden PINs stimmen nicht überein.");
+      await daten.einstellungSpeichern("adminPin", hash);
+      app.adminPinHash = hash;
+      toast("Admin-PIN festgelegt ✓");
+    } else if (hash !== app.adminPinHash) {
+      $("admin-pin").value = "";
+      return (fehler.textContent = "Falsche PIN.");
+    }
+    sessionStorage.setItem(ADMIN_KEY, "1");
+    fehler.textContent = "";
+    $("admin-gesperrt").hidden = true;
+    $("admin-offen").hidden = false;
+    adminRendern();
+    render();
+  } catch (e) {
+    console.error(e);
+    fehler.textContent = "Das hat nicht geklappt. Bitte erneut versuchen.";
+  }
+}
+
+function adminRendern() {
+  const heute = heuteIso();
+  const personen = [...app.personen].sort((a, b) => a.name.localeCompare(b.name));
+  $("admin-personen").innerHTML = personen.length ? personen.map((p) => {
+    const anzahl = app.eintraege.filter((e) => e.name === p.name).length;
+    const zusatz = [
+      p.id === GERAET_ID ? "Du" : "",
+      !p.geraet ? "altes Profil" : "",
+      personen.filter((x) => x.name === p.name).length > 1 ? "doppelt" : "",
+    ].filter(Boolean).join(" · ");
+    return `<li class="admin-zeile">
+      ${avatar(p.name, p.farbe, "klein")}
+      <div class="admin-text"><strong>${esc(p.name)}</strong>
+        <span>${anzahl} ${anzahl === 1 ? "Eintrag" : "Einträge"}${zusatz ? " · " + zusatz : ""}</span></div>
+      <button type="button" class="mini-btn nein" data-person-loeschen="${esc(p.id)}">Löschen</button>
+    </li>`;
+  }).join("") : `<li class="leer-hinweis">Keine Profile vorhanden.</li>`;
+  const alt = app.eintraege.filter((e) => (e.ende || e.start) < heute).length;
+  $("admin-alt").textContent = `🧹 Vergangene Einträge löschen (${alt})`;
+  $("admin-alt").disabled = alt === 0;
+  $("admin-anzahl").textContent = `${app.personen.length} Profile · ${app.eintraege.length} Einträge`;
+}
+
+/** Zweimal tippen zum Bestätigen */
+function zweiterKlick(knopf, text = "Sicher?") {
+  if (knopf.classList.contains("sicher")) return true;
+  const alt = knopf.textContent;
+  knopf.classList.add("sicher");
+  knopf.textContent = text;
+  setTimeout(() => { if (knopf.isConnected) { knopf.classList.remove("sicher"); knopf.textContent = alt; } }, 3000);
+  return false;
+}
+
+async function personEntfernen(id, knopf) {
+  const p = app.personen.find((x) => x.id === id);
+  if (!p) return;
+  // Einträge nur löschen, wenn es kein weiteres Profil mit gleichem Namen gibt
+  const nochEinerMitNamen = app.personen.some((x) => x.id !== id && x.name === p.name);
+  const seine = nochEinerMitNamen ? [] : app.eintraege.filter((e) => e.name === p.name);
+  if (!zweiterKlick(knopf, seine.length ? `Inkl. ${seine.length} ${seine.length === 1 ? "Eintrag" : "Einträge"}?` : "Sicher?")) return;
+  knopf.disabled = true;
+  try {
+    await daten.personLoeschen(id);
+    for (const e of seine) await daten.eintragLoeschen(e.id);
+    if (!nochEinerMitNamen) {
+      // Aus Einladungen anderer Einträge entfernen
+      for (const e of app.eintraege.filter((x) => x.name !== p.name && (x.eingeladen || []).includes(p.name))) {
+        const antworten = { ...(e.antworten || {}) };
+        delete antworten[p.name];
+        await daten.eintragSpeichern({ ...e, eingeladen: e.eingeladen.filter((n) => n !== p.name), antworten });
+      }
+    }
+    toast(`${p.name} gelöscht ✓`);
+  } catch (e) {
+    console.error(e);
+    toast("Löschen fehlgeschlagen.", true);
+  }
+}
+
+async function vergangeneLoeschen(knopf) {
+  const heute = heuteIso();
+  const alt = app.eintraege.filter((e) => (e.ende || e.start) < heute);
+  if (!alt.length || !zweiterKlick(knopf, `Wirklich ${alt.length} löschen?`)) return;
+  knopf.disabled = true;
+  try {
+    for (const e of alt) await daten.eintragLoeschen(e.id);
+    toast(`${alt.length} alte Einträge gelöscht ✓`);
+  } catch (e) {
+    console.error(e);
+    toast("Löschen fehlgeschlagen.", true);
+  }
+}
+
+function adminBeenden() {
+  try { sessionStorage.removeItem(ADMIN_KEY); } catch {}
+  $("admin-dialog").close();
+  toast("Admin-Modus beendet");
+  render();
 }
 
 // ---------- Eintrag ----------
@@ -366,7 +584,7 @@ function offeneEinladungen() {
 
 function einladungPruefen() {
   const dlg = $("einladung-dialog");
-  if (dlg.open || $("eintrag-dialog").open || $("profil-dialog").open) return;
+  if (dlg.open || $("eintrag-dialog").open || $("profil-dialog").open || $("admin-dialog").open) return;
   const e = offeneEinladungen().find((x) => !app.spaeter.has(x.id));
   if (!e) return;
   app.offeneEinladung = e.id;
@@ -503,6 +721,16 @@ function ereignisse() {
 
   // Profil
   $("profil-btn").onclick = profilOeffnen;
+  $("admin-btn").onclick = adminOeffnen;
+  $("admin-gesperrt").onsubmit = adminEntsperren;
+  $("admin-zu").onclick = () => $("admin-dialog").close();
+  $("admin-zu2").onclick = () => $("admin-dialog").close();
+  $("admin-beenden").onclick = adminBeenden;
+  $("admin-alt").onclick = (e) => vergangeneLoeschen(e.currentTarget);
+  $("admin-personen").onclick = (e) => {
+    const b = e.target.closest("[data-person-loeschen]");
+    if (b) personEntfernen(b.dataset.personLoeschen, b);
+  };
   $("profil-form").onsubmit = profilSpeichern;
   $("profil-abbrechen").onclick = () => $("profil-dialog").close();
   $("profil-dialog").addEventListener("cancel", (e) => { if (!app.ich) e.preventDefault(); });
@@ -537,23 +765,18 @@ async function start() {
     h.textContent = "Lokaler Testmodus: Einträge werden nur auf diesem Gerät gespeichert. Für den gemeinsamen Kalender Firebase in js/config.js eintragen.";
   }
 
-  daten.abonnieren(({ personen, eintraege }) => {
+  daten.abonnieren(({ personen, eintraege, vomServer }) => {
     app.personen = personen;
     app.eintraege = eintraege;
-    // Eigene Farbe aus der gemeinsamen Liste übernehmen
-    if (app.ich) {
-      const p = personen.find((x) => x.name === app.ich.name);
-      if (p) app.ich.farbe = p.farbe;
-    }
+    profilAbgleichen(personen, vomServer);
     render();
+    if ($("admin-dialog").open && istAdmin()) adminRendern();
     einladungPruefen();
   });
   ["eintrag-dialog", "profil-dialog"].forEach((id) =>
     $(id).addEventListener("close", () => setTimeout(einladungPruefen, 400)));
 
   if (!app.ich) profilOeffnen();
-  // Bereits bekanntes Profil in die gemeinsame Liste übernehmen (z. B. nach dem Wechsel auf Firebase)
-  else daten.personSpeichern(app.ich).catch((e) => console.warn("Profil:", e));
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js").catch((e) => console.warn("SW:", e));
