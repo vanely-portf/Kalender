@@ -3,21 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#7c3aed" />
+  <meta name="theme-color" content="#799DAC" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Freundeskalender" />
   <title>Freundeskalender</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script>
+    // Gewähltes Design sofort setzen, damit nichts aufblitzt
+    try { document.documentElement.dataset.design = localStorage.getItem("fk-design") || "pastell"; } catch (e) {}
+  </script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <!-- Kopfbereich -->
   <header class="hero">
+    <span class="hero-deko" aria-hidden="true"></span>
+    <span class="hero-emoji" aria-hidden="true"></span>
     <div class="hero-zeile">
-      <span class="logo">📅 Freundeskalender</span>
+      <span class="logo"><img src="icons/icon-192.png" alt="" /> Freundeskalender</span>
       <button id="profil-btn" class="profil-chip" type="button" aria-label="Profil bearbeiten">
         <span class="avatar klein" id="profil-punkt"></span>
         <span id="profil-name">Name eingeben</span>
@@ -96,6 +104,11 @@
       <fieldset>
         <legend>Deine Farbe</legend>
         <div id="farb-auswahl" class="farben"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Kalender-Design</legend>
+        <div id="design-auswahl" class="designs"></div>
+        <p class="klein-hinweis" style="margin-top:.5rem">Das Design gilt nur auf diesem Gerät – deine Freunde sehen ihr eigenes.</p>
       </fieldset>
       <p id="profil-fehler" class="fehler" role="alert"></p>
       <div class="aktionen">

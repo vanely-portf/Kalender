@@ -2,6 +2,7 @@
 // App: Oberfläche, Ereignisse, Formulare, Prüfungen
 // ------------------------------------------------------------
 import * as daten from "./storage.js";
+import { DESIGNS, aktuellesDesign, designAnwenden } from "./designs.js";
 import {
   STATUS, MONATE, WOCHENTAGE_KURZ, monatsRaster, verfuegbarkeit,
   besteTage, datumLang, datumKurz, heuteIso, ausIso, betrifftTag,
@@ -243,8 +244,20 @@ function renderLegende() {
     .map((s) => `<li><span class="badge" style="--c:${s.farbe}">${s.emoji} ${s.label}</span></li>`).join("");
 }
 
+// ---------- Design ----------
+function designsRendern() {
+  const aktiv = aktuellesDesign();
+  $("design-auswahl").innerHTML = DESIGNS.map((d) => `
+    <button type="button" class="design-karte ${d.id === aktiv ? "aktiv" : ""}" data-design-id="${d.id}" aria-pressed="${d.id === aktiv}">
+      <span class="design-name">${d.name}<small>${d.emoji}</small></span>
+      <span class="design-text">${d.text}</span>
+      <span class="design-farben">${d.farben.map((f) => `<i style="background:${f}"></i>`).join("")}</span>
+    </button>`).join("");
+}
+
 // ---------- Profil ----------
 function profilOeffnen() {
+  designsRendern();
   const vorhanden = !!app.ich;
   const input = $("profil-input");
   input.value = app.ich?.name || "";
@@ -620,6 +633,13 @@ function ereignisse() {
   // Profil
   $("profil-btn").onclick = profilOeffnen;
   $("profil-loeschen").onclick = profilLoeschen;
+  $("design-auswahl").onclick = (e) => {
+    const b = e.target.closest("[data-design-id]");
+    if (!b) return;
+    const d = designAnwenden(b.dataset.designId);
+    designsRendern();
+    toast(`${d.emoji} ${d.name}`);
+  };
 
   $("profil-form").onsubmit = profilSpeichern;
   $("profil-abbrechen").onclick = () => $("profil-dialog").close();
@@ -645,6 +665,7 @@ function ereignisse() {
 
 // ---------- Start ----------
 async function start() {
+  designAnwenden(aktuellesDesign(), false);
   ereignisse();
   render();
   await daten.starten();
