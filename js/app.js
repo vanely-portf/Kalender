@@ -4,7 +4,7 @@
 import * as daten from "./storage.js";
 import { DESIGNS, aktuellesDesign, designAnwenden } from "./designs.js";
 import { ICON, THEME_ICON, MINI_DEKO, statusIcon } from "./icons.js";
-import { SZENEN } from "./szenen.js";
+import { SZENEN, HIMMEL } from "./szenen.js";
 import {
   STATUS, MONATE, WOCHENTAGE_KURZ, monatsRaster, verfuegbarkeit,
   besteTage, datumLang, datumKurz, heuteIso, ausIso, betrifftTag, isoDatum,
@@ -253,6 +253,7 @@ function renderLegende() {
 function themeDekoRendern() {
   const id = aktuellesDesign();
   const ic = THEME_ICON[id];
+  $("hero-himmel").innerHTML = HIMMEL(id);
   $("hero-szene").innerHTML = (SZENEN[id] || SZENEN.pastell)();
   szeneAbspielen(800);
   $("kal-deko-1").innerHTML = ic;

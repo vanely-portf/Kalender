@@ -20,9 +20,22 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- Pinsel-Filter für den gemalten Look der Animationen -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="pinsel" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4" result="rauschen"/>
+      <feDisplacementMap in="SourceGraphic" in2="rauschen" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="pinsel-weich" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="9" result="rauschen"/>
+      <feDisplacementMap in="SourceGraphic" in2="rauschen" scale="4" xChannelSelector="R" yChannelSelector="G" result="verzerrt"/>
+      <feGaussianBlur in="verzerrt" stdDeviation=".6"/>
+    </filter>
+  </svg>
   <!-- Kopfbereich -->
   <header class="hero">
     <span class="hero-deko" aria-hidden="true"></span>
+    <div class="hero-himmel" id="hero-himmel" aria-hidden="true"></div>
     <div class="hero-szene" id="hero-szene" aria-hidden="true"></div>
     <div class="hero-zeile">
       <span class="logo"><img src="icons/icon-192.png" alt="" /> Freundeskalender</span>
