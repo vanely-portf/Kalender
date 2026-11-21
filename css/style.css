@@ -413,32 +413,13 @@ legend { font-size: .85rem; font-weight: 700; margin-bottom: .5rem; padding: 0; 
 .spaeter { justify-self: center; font-size: .85rem; color: var(--leise); }
 
 /* ============================================================
-   Profil pro Gerät & Admin-Bereich
+   Profil pro Gerät
    ============================================================ */
 input[readonly] { background: #f1eef8; color: var(--leise); cursor: not-allowed; }
 input[readonly]:focus { border-color: var(--linie); box-shadow: none; }
 .farbe.vergeben { opacity: .3; position: relative; }
 .farbe.vergeben::after { content: "✕"; color: #fff; font-weight: 800; }
 
-.admin-link {
-  justify-self: center; margin: .2rem 0 .6rem;
-  background: none; border: 0; color: var(--leise); font-size: .85rem; font-weight: 600;
-  padding: .5rem 1rem; border-radius: 999px;
-}
-.admin-link:hover { background: #ece6fb; }
-
-.admin-inhalt { padding: .6rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom)); }
-.admin-block { display: grid; gap: .8rem; }
-.admin-block h2 { margin: 0; font-size: 1.3rem; }
-.admin-block h3 { margin: .4rem 0 0; }
-.admin-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; max-height: 40vh; overflow-y: auto; }
-.admin-zeile {
-  display: flex; align-items: center; gap: .6rem;
-  background: #faf8ff; border-radius: 14px; padding: .55rem .7rem;
-}
-.admin-text { flex: 1; min-width: 0; display: grid; }
-.admin-text span { font-size: .78rem; color: var(--leise); }
 .mini-btn.nein { border: 1.5px solid var(--rot-hell); }
 .mini-btn.sicher, .sek-btn.sicher { background: var(--rot); color: #fff; border-color: var(--rot); animation: plopp-chip .3s var(--federnd); }
 .mini-btn:disabled, .sek-btn:disabled { opacity: .45; cursor: default; }
-.icon-btn.admin-loeschen { background: var(--rot-hell); }

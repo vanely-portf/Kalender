@@ -3,7 +3,6 @@
 // ------------------------------------------------------------
 // Datenmodell
 //   Person:  { id (= Geräte-ID), name, farbe, geraet: true }
-//   Einstellung (z. B. Admin-PIN): gruppen/<gruppe>/einstellungen/<key>
 //   Eintrag: { id, name, start: "YYYY-MM-DD", ende: "YYYY-MM-DD",
 //              status, von: "HH:MM" | "", bis: "HH:MM" | "", notiz, erstellt }
 
@@ -91,12 +90,6 @@ const lokal = {
     zustand.personen = zustand.personen.filter((x) => x.id !== id);
     lokalSichern(); melden();
   },
-  async einstellungLesen(key) {
-    try { return JSON.parse(localStorage.getItem(LS_KEY + "-einst-" + key)); } catch { return null; }
-  },
-  async einstellungSpeichern(key, wert) {
-    localStorage.setItem(LS_KEY + "-einst-" + key, JSON.stringify(wert));
-  },
 };
 
 // ---------- Firebase-Modus ----------
@@ -138,13 +131,6 @@ function firebaseBackend() {
     async personLoeschen(id) {
       await fs.deleteDoc(fs.doc(db, ...pfad("personen"), id));
     },
-    async einstellungLesen(key) {
-      const d = await fs.getDoc(fs.doc(db, ...pfad("einstellungen"), key));
-      return d.exists() ? d.data().wert : null;
-    },
-    async einstellungSpeichern(key, wert) {
-      await fs.setDoc(fs.doc(db, ...pfad("einstellungen"), key), { wert });
-    },
   };
 }
 
@@ -170,14 +156,6 @@ export async function personSpeichern({ id, name, farbe }) {
 
 export async function personLoeschen(id) {
   await backend.personLoeschen(id);
-}
-
-export async function einstellungLesen(key) {
-  return backend.einstellungLesen(key);
-}
-
-export async function einstellungSpeichern(key, wert) {
-  await backend.einstellungSpeichern(key, wert);
 }
 
 export async function eintragSpeichern(eintrag) {

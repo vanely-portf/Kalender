@@ -82,46 +82,7 @@
       <button id="einladen-btn" class="sek-btn einladen-btn" type="button">➕ Freunde zur App einladen</button>
     </section>
 
-    <button id="admin-btn" class="admin-link" type="button">🔐 Admin</button>
   </main>
-
-  <!-- Admin-Bereich -->
-  <dialog id="admin-dialog" class="sheet">
-    <div class="admin-inhalt">
-      <div class="griff"></div>
-
-      <form id="admin-gesperrt" class="admin-block" novalidate>
-        <h2>🔐 Admin-Bereich</h2>
-        <p id="admin-text" class="klein-hinweis"></p>
-        <label>Admin-PIN
-          <input id="admin-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="20" />
-        </label>
-        <label id="admin-pin2-feld" hidden>PIN wiederholen
-          <input id="admin-pin2" type="password" inputmode="numeric" autocomplete="off" maxlength="20" />
-        </label>
-        <p id="admin-fehler" class="fehler" role="alert"></p>
-        <div class="aktionen">
-          <button id="admin-zu" type="button" class="sek-btn">Abbrechen</button>
-          <button id="admin-los" type="submit" class="primaer-btn">Entsperren</button>
-        </div>
-      </form>
-
-      <div id="admin-offen" class="admin-block" hidden>
-        <h2>🔐 Admin-Bereich</h2>
-        <p id="admin-anzahl" class="klein-hinweis"></p>
-        <h3>Profile</h3>
-        <p class="klein-hinweis">Beim Löschen eines Profils werden auch seine Einträge gelöscht. Zum Bestätigen zweimal tippen.</p>
-        <ul id="admin-personen" class="admin-liste"></ul>
-        <h3>Aufräumen</h3>
-        <button id="admin-alt" type="button" class="sek-btn">🧹 Vergangene Einträge löschen</button>
-        <p class="klein-hinweis">Im Admin-Modus siehst du bei allen Einträgen einen 🗑-Knopf.</p>
-        <div class="aktionen">
-          <button id="admin-beenden" type="button" class="sek-btn">Admin beenden</button>
-          <button id="admin-zu2" type="button" class="primaer-btn">Fertig</button>
-        </div>
-      </div>
-    </div>
-  </dialog>
 
   <!-- Profil-Dialog -->
   <dialog id="profil-dialog" class="sheet">
