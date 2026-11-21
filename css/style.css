@@ -157,24 +157,24 @@
 /* ---------- Brombeernacht (dunkel, Kerzen, Klavier) ---------- */
 [data-design="brombeere"] {
   --hero-ende: #1A141F;
-  --bg: #121016;
+  --bg: #0E0C12;
   --bg-muster: radial-gradient(circle at 80% 0%, rgba(142, 90, 158, .18), transparent 45%);
   --bg-groesse: 100% 100%;
-  --karte: #1C1820;
-  --karte-rand: #2E2733;
-  --text: #EDE5EC;
-  --leise: #A597A9;
-  --linie: #2E2733;
-  --feld: #231E28;
-  --tag: #221D27;
-  --tag-hover: #2D2633;
-  --weich: #2A2231;
-  --weich-2: #352B3D;
-  --akzent: #8E5A9E;
-  --akzent-text: #C79BD6;
+  --karte: #221C28;
+  --karte-rand: #463A50;
+  --text: #FBF6FB;
+  --leise: #CBBFD0;
+  --linie: #3E3446;
+  --feld: #2B2432;
+  --tag: #2E2636;
+  --tag-hover: #3A3044;
+  --weich: #382D42;
+  --weich-2: #45384F;
+  --akzent: #B07CC2;
+  --akzent-text: #E2C2EE;
   --akzent-2: #EFE6D8;
-  --knopf: #6B3A7A;
-  --knopf-text: #F3EADC;
+  --knopf: #8A4E9E;
+  --knopf-text: #FFF8EE;
   --knopf-schatten: 0 8px 20px rgba(0, 0, 0, .45);
   --hero: radial-gradient(circle at 88% 62%, #EFE6D8 0 20px, rgba(239, 230, 216, .22) 21px, transparent 56px), linear-gradient(180deg, #2B1C33 0%, #17121C 100%);
   --hero-text: #EFE6D8;
@@ -182,18 +182,18 @@
   --deko-1: #2A1F30;
   --deko-2: #33263B;
   --deko-3: #241A2A;
-  --heute: #C79BD6;
+  --heute: #E2C2EE;
   --heute-text: #121016;
   --gewaehlt: #EFE6D8;
   --gewaehlt-text: #121016;
-  --wochenende: #C79BD6;
-  --gruen: #9CCB9F;
-  --gruen-hell: rgba(110, 160, 110, .22);
-  --gelb-hell: rgba(214, 180, 110, .2);
-  --rot-hell: rgba(190, 70, 100, .25);
-  --rot: #E58BA0;
-  --balken: #8E5A9E;
-  --mini-deko: #C79BD6;
+  --wochenende: #E2C2EE;
+  --gruen: #AEE0B1;
+  --gruen-hell: rgba(120, 200, 125, .32);
+  --gelb-hell: rgba(235, 195, 110, .32);
+  --rot-hell: rgba(225, 85, 120, .36);
+  --rot: #F4A2B4;
+  --balken: #B07CC2;
+  --mini-deko: #E2C2EE;
   --radius: 14px;
   --radius-klein: 10px;
   --bogen: 999px 999px 8px 8px;
@@ -461,16 +461,16 @@ h3 {
 .hero::before, .hero::after {
   content: ""; position: absolute; bottom: -10px;
   border-radius: var(--bogen);
-  opacity: .9;
+  opacity: .4;
 }
 .hero::before { width: 86px; height: 120px; right: 112px; background: var(--deko-1); transform: translateY(38px); }
 .hero::after { width: 86px; height: 150px; right: 18px; background: var(--deko-2); transform: translateY(30px); }
 .hero-deko {
   position: absolute; right: 210px; bottom: -10px;
   width: 70px; height: 92px; border-radius: var(--bogen);
-  background: var(--deko-3); opacity: .9; transform: translateY(40px);
+  background: var(--deko-3); opacity: .4; transform: translateY(40px);
 }
-.hero-zeile, .gruss, .gruss-unter { max-width: 560px; margin-left: auto; margin-right: auto; position: relative; z-index: 1; }
+.hero-zeile, .gruss, .gruss-unter { max-width: 560px; margin-left: auto; margin-right: auto; position: relative; z-index: 2; }
 .hero-zeile { display: flex; align-items: center; justify-content: space-between; }
 .logo { font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; }
 .logo img { width: 30px; height: 30px; border-radius: 9px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
@@ -497,7 +497,9 @@ main { max-width: 560px; margin: -3.4rem auto 0; padding: 0 .9rem; display: grid
 }
 
 .karte {
-  background: var(--karte);
+  background: color-mix(in srgb, var(--karte) var(--deckkraft, 80%), transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+          backdrop-filter: blur(14px) saturate(1.15);
   border: 1px solid var(--karte-rand);
   border-radius: var(--radius);
   padding: 1.2rem;
@@ -710,7 +712,9 @@ main > .karte:nth-of-type(4) { animation-delay: .15s; }
   border: 0; padding: 0; width: 100%; max-width: 560px;
   margin: auto auto 0; border-radius: 30px 30px 0 0;
   max-height: 92vh; overflow-y: auto;
-  background: var(--karte); color: var(--text);
+  background: color-mix(in srgb, var(--karte) 90%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+          backdrop-filter: blur(18px) saturate(1.1); color: var(--text);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, .15);
 }
 .sheet[open] { animation: hoch .35s var(--federnd); }
@@ -810,7 +814,9 @@ legend { font-size: .85rem; font-weight: 700; margin-bottom: .55rem; padding: 0;
    ============================================================ */
 .popup {
   border: 0; padding: 0; width: calc(100% - 2rem); max-width: 380px;
-  border-radius: var(--radius); background: var(--karte); color: var(--text);
+  border-radius: var(--radius); background: color-mix(in srgb, var(--karte) 90%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+          backdrop-filter: blur(18px) saturate(1.1); color: var(--text);
   box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
 }
 .popup[open] { animation: popup-rein .4s var(--federnd); }
@@ -877,12 +883,6 @@ legend .ic, .antwort-zeile .ic, .gaeste > .ic { color: var(--akzent-text); margi
 }
 .platz.p1 { background: var(--knopf); color: var(--knopf-text); }
 
-/* Kopfbereich: Theme-Symbole */
-.hero-icons { position: absolute; left: 1.2rem; bottom: 4.1rem; display: flex; gap: .45rem; z-index: 1; }
-.hero-icons span { width: 30px; height: 30px; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.12)); animation: schweben 4s ease-in-out infinite; }
-.hero-icons span:nth-child(2) { width: 22px; height: 22px; margin-top: 10px; animation-delay: .7s; }
-.hero-icons span:nth-child(3) { width: 26px; height: 26px; margin-top: 2px; animation-delay: 1.4s; }
-
 /* Kalender: Deko pro Theme */
 .kalender { position: relative; overflow: hidden; }
 .kal-deko { position: absolute; pointer-events: none; opacity: .14; z-index: 0; }
@@ -945,14 +945,13 @@ legend .ic, .antwort-zeile .ic, .gaeste > .ic { color: var(--akzent-text); margi
 [data-design="neon"] .monat, [data-design="neon"] .gruss { text-shadow: 0 0 12px rgba(255, 46, 159, .65); }
 [data-design="neon"] .tag.heute .nr { box-shadow: 0 0 12px #FF2E9F; }
 [data-design="neon"] .tag.gewaehlt { box-shadow: 0 0 16px rgba(41, 226, 255, .7); }
-[data-design="neon"] .karte { backdrop-filter: blur(6px); }
 [data-design="neon"] .kal-deko { opacity: .22; }
 [data-design="neon"] .hero::before, [data-design="neon"] .hero::after, [data-design="neon"] .hero-deko { opacity: .35; border: 1.5px solid #FF2E9F; box-shadow: 0 0 14px rgba(255, 46, 159, .6); }
 [data-design="brombeere"] .hero::after { display: none; }
-[data-design="feenglanz"] .karte { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 [data-design="feenglanz"] .gruss { text-shadow: 0 0 18px rgba(255, 255, 255, .9); }
 [data-design="feenglanz"] .tag.heute .nr { box-shadow: 0 0 12px rgba(244, 154, 201, .8); }
 [data-design="feenglanz"] .kal-deko { opacity: .3; }
+[data-design="brombeere"], [data-design="neon"], [data-design="kerze"] { --deckkraft: 86%; }
 [data-design="brombeere"] .gruss, [data-design="kerze"] .gruss { text-shadow: 0 2px 10px rgba(0, 0, 0, .45); }
 [data-design="brombeere"] .kal-deko, [data-design="kerze"] .kal-deko { opacity: .2; }
 [data-design="kerze"] .monat { font-style: italic; }
@@ -960,6 +959,259 @@ legend .ic, .antwort-zeile .ic, .gaeste > .ic { color: var(--akzent-text); margi
 [data-design="tee"] .monat { font-style: italic; }
 [data-design="pudding"] .tag.heute .nr { box-shadow: 0 0 0 2px #FFF8F3, 0 0 0 3.5px #B3263A; }
 [data-design="melonsoda"] .tag.heute .nr { box-shadow: 0 3px 8px rgba(242, 92, 110, .4); }
+
+
+/* ============================================================
+   Header-Szenen (laufen alle 20 s einmal ab)
+   ============================================================ */
+.hero-szene { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.hero-szene > * { position: absolute; display: block; }
+.hero-szene svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.hero-szene .fluegel, .hero-szene .kopf, .hero-szene .schwanz, .hero-szene .tentakel, .hero-szene .pudding-koerper { transform-box: view-box; }
+
+/* Pretty Pastell: Vögel */
+.sz-vogel { top: var(--y); left: 105%; width: 48px; height: 30px; opacity: 0; }
+.los .sz-vogel { animation: vogel-flug 8s linear var(--d) both; }
+.los .sz-vogel .fluegel { transform-origin: 20px 12px; animation: flattern .28s ease-in-out infinite alternate; }
+@keyframes vogel-flug {
+  0% { left: 105%; opacity: 1; transform: translateY(0) scale(var(--s)); }
+  25% { transform: translateY(-12px) scale(var(--s)); }
+  50% { transform: translateY(4px) scale(var(--s)); }
+  75% { transform: translateY(-9px) scale(var(--s)); }
+  100% { left: -20%; opacity: 1; transform: translateY(0) scale(var(--s)); }
+}
+@keyframes flattern { to { transform: scaleY(-.45); } }
+
+/* Melon Soda: Blasen + Qualle */
+.sz-blase {
+  left: var(--x); top: 190px; width: var(--g); height: var(--g); border-radius: 50%; opacity: 0;
+  border: 1.5px solid rgba(255, 255, 255, .95);
+  background: radial-gradient(circle at 32% 30%, #fff 0 18%, rgba(255, 255, 255, .25) 22%, rgba(255, 255, 255, .08) 70%);
+}
+.los .sz-blase { animation: blase 5s ease-in var(--d) both; }
+@keyframes blase {
+  0% { opacity: 0; transform: translate(0, 0) scale(.6); }
+  12% { opacity: .95; }
+  50% { transform: translate(var(--w), -80px) scale(1); }
+  85% { opacity: .9; }
+  100% { opacity: 0; transform: translate(0, -175px) scale(1.1); }
+}
+.sz-qualle { right: 9%; top: 140px; width: 46px; height: 60px; opacity: 0; }
+.los .sz-qualle { animation: qualle 9s ease-in-out .6s both; }
+.los .sz-qualle .tentakel { transform-origin: 20px 22px; animation: tentakel 1.2s ease-in-out infinite alternate; }
+@keyframes qualle {
+  0% { opacity: 0; transform: translateY(40px) scale(1, 1); }
+  12% { opacity: 1; }
+  20% { transform: translateY(10px) scale(1, .88); }
+  32% { transform: translateY(-10px) scale(1, 1.05); }
+  46% { transform: translateY(-30px) scale(1, .88); }
+  60% { transform: translateY(-52px) scale(1, 1.05); }
+  74% { transform: translateY(-74px) scale(1, .9); }
+  88% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-110px) scale(1, 1); }
+}
+@keyframes tentakel { to { transform: skewX(8deg) scaleY(.92); } }
+
+/* Feenglanz: Schmetterling + Glitzerspur */
+.sz-schmetterling { left: 105%; top: 76px; width: 58px; height: 44px; opacity: 0; filter: drop-shadow(0 0 6px rgba(255, 255, 255, .9)); }
+.los .sz-schmetterling { animation: schmetterling 5.5s ease-in-out .2s both; }
+.los .sz-schmetterling .fluegel { transform-origin: 20px 15px; animation: falter .22s ease-in-out infinite alternate; }
+@keyframes schmetterling {
+  0% { left: 105%; opacity: 1; transform: translateY(0) rotate(-8deg); }
+  20% { transform: translateY(-22px) rotate(6deg); }
+  40% { transform: translateY(16px) rotate(-6deg); }
+  60% { transform: translateY(-14px) rotate(8deg); }
+  80% { transform: translateY(10px) rotate(-4deg); }
+  100% { left: -18%; opacity: 1; transform: translateY(-20px) rotate(0); }
+}
+@keyframes falter { to { transform: scaleX(.25); } }
+.sz-funke { left: var(--x); top: var(--y); width: 14px; height: 14px; opacity: 0; filter: drop-shadow(0 0 4px #fff); }
+.los .sz-funke { animation: funke 1.6s ease-out var(--d) both; }
+@keyframes funke {
+  0% { opacity: 0; transform: scale(0) rotate(0); }
+  30% { opacity: 1; transform: scale(1.2) rotate(60deg); }
+  100% { opacity: 0; transform: scale(.2) translateY(14px) rotate(160deg); }
+}
+
+/* Brombeernacht: Fledermäuse vor dem Mond */
+.sz-fledermaus { left: 108%; top: var(--y); width: 56px; height: 34px; opacity: 0; }
+.los .sz-fledermaus { animation: fledermaus 6s ease-in-out var(--d) both; }
+.los .sz-fledermaus .fluegel { transform-origin: 20px 12px; animation: flattern .2s ease-in-out infinite alternate; }
+@keyframes fledermaus {
+  0% { left: 108%; opacity: 1; transform: translateY(0) scale(var(--s)); }
+  20% { transform: translateY(-16px) scale(var(--s)); }
+  40% { transform: translateY(8px) scale(var(--s)); }
+  60% { transform: translateY(-20px) scale(var(--s)); }
+  80% { transform: translateY(4px) scale(var(--s)); }
+  100% { left: -20%; opacity: 1; transform: translateY(-8px) scale(var(--s)); }
+}
+
+/* Neon Tokyo: Lichtstreifen + flackerndes Herz */
+.sz-streifen {
+  top: var(--y); left: -40%; width: 140px; height: 2px; border-radius: 2px; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--f));
+  box-shadow: 0 0 8px var(--f), 0 0 16px var(--f);
+}
+.los .sz-streifen { animation: streifen 1.4s cubic-bezier(.5, 0, .3, 1) var(--d) both; }
+@keyframes streifen { 0% { left: -40%; opacity: 1; } 100% { left: 110%; opacity: 1; } }
+.sz-neonherz { right: 8%; top: 86px; width: 52px; height: 46px; opacity: 0; filter: drop-shadow(0 0 6px #FF2E9F) drop-shadow(0 0 14px #FF2E9F); }
+.los .sz-neonherz { animation: neonherz 8s linear .3s both; }
+@keyframes neonherz {
+  0%, 8% { opacity: 0; } 9% { opacity: 1; } 10% { opacity: .1; } 12% { opacity: 1; } 13% { opacity: .3; } 15%, 82% { opacity: 1; }
+  83% { opacity: .2; } 84% { opacity: 1; } 86% { opacity: .1; } 88%, 100% { opacity: 0; }
+}
+
+/* Kerzenschein: fallende Rosenblätter */
+.sz-blatt { left: var(--x); top: -20px; width: 17px; height: 20px; opacity: 0; }
+.los .sz-blatt { animation: blatt 6.5s ease-in-out var(--d) both; }
+@keyframes blatt {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  10% { opacity: .95; }
+  35% { transform: translate(var(--w), 70px) rotate(calc(var(--r) * .4)); }
+  65% { transform: translate(calc(var(--w) * -1), 140px) rotate(calc(var(--r) * .8)); }
+  90% { opacity: .9; }
+  100% { opacity: 0; transform: translate(0, 210px) rotate(var(--r)); }
+}
+
+/* Teestunde: Häschen + Blümchen */
+.sz-hase { left: 105%; top: 118px; width: 70px; height: 58px; opacity: 0; }
+.los .sz-hase { animation: hase-weg 9s linear .2s both; }
+.los .sz-hase svg { animation: hase-hopsen 9s linear .2s both; }
+.los .sz-hase .kopf { transform-origin: 14px 26px; animation: schnuppern 9s ease-in-out .2s both; }
+@keyframes hase-weg {
+  0% { left: 105%; opacity: 1; transform: scaleX(1); }
+  36% { left: 58%; transform: scaleX(1); }
+  62% { left: 58%; transform: scaleX(1); }
+  63% { transform: scaleX(-1); }
+  100% { left: 108%; opacity: 1; transform: scaleX(-1); }
+}
+@keyframes schnuppern {
+  0%, 38% { transform: rotate(0); } 42% { transform: rotate(-7deg); } 45% { transform: rotate(0); }
+  48% { transform: rotate(-7deg); } 51% { transform: rotate(0); } 54% { transform: rotate(-7deg); } 57%, 100% { transform: rotate(0); }
+}
+.sz-bluete { left: var(--x); top: 168px; width: 17px; height: 17px; opacity: 0; }
+.los .sz-bluete { animation: bluete 5.5s ease-out var(--d) both; }
+@keyframes bluete {
+  0% { opacity: 0; transform: scale(0) rotate(0); } 15% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+  75% { opacity: 1; transform: scale(1) rotate(90deg); } 100% { opacity: 0; transform: scale(.6) rotate(120deg); }
+}
+
+/* Kirschpudding: Katze isst den Pudding */
+.sz-pudding { left: 56%; top: 140px; width: 42px; height: 42px; }
+.sz-pudding .pudding-koerper { transform-origin: 16px 27px; }
+.los .sz-pudding .pudding-koerper { animation: pudding-weg 10s linear .2s both; }
+@keyframes pudding-weg {
+  0%, 30% { transform: scale(1, 1); opacity: 1; }
+  38% { transform: scale(1, .7); }
+  46% { transform: scale(.95, .42); }
+  55% { transform: scale(.9, .1); opacity: 1; }
+  57%, 94% { transform: scale(.9, 0); opacity: 0; }
+  95% { transform: scale(1, 1); opacity: 0; }
+  100% { transform: scale(1, 1); opacity: 1; }
+}
+.sz-katze { left: 108%; top: 114px; width: 96px; height: 66px; opacity: 0; }
+.los .sz-katze { animation: katze-weg 10s linear .2s both; }
+.los .sz-katze svg { animation: katze-gehen 10s linear .2s both; }
+.los .sz-katze .kopf { transform-origin: 24px 28px; animation: katze-fressen 10s ease-in-out .2s both; }
+.los .sz-katze .schwanz { transform-origin: 52px 26px; animation: schwanz 1.4s ease-in-out infinite alternate; }
+@keyframes katze-weg {
+  0% { left: 108%; opacity: 1; transform: scaleX(1); }
+  26% { left: calc(56% + 28px); transform: scaleX(1); }
+  60% { left: calc(56% + 28px); transform: scaleX(1); }
+  62% { transform: scaleX(-1); }
+  96% { left: 110%; opacity: 1; transform: scaleX(-1); }
+  100% { left: 110%; opacity: 1; transform: scaleX(-1); }
+}
+@keyframes katze-fressen {
+  0%, 27% { transform: rotate(0); }
+  30% { transform: rotate(-24deg) translateY(4px); } 34% { transform: rotate(-14deg) translateY(2px); }
+  38% { transform: rotate(-24deg) translateY(4px); } 42% { transform: rotate(-14deg) translateY(2px); }
+  46% { transform: rotate(-24deg) translateY(4px); } 50% { transform: rotate(-14deg) translateY(2px); }
+  54% { transform: rotate(-24deg) translateY(4px); }
+  58%, 100% { transform: rotate(0); }
+}
+@keyframes schwanz { from { transform: rotate(-6deg); } to { transform: rotate(10deg); } }
+.sz-herz { left: calc(56% + 40px); top: 100px; width: 15px; height: 15px; opacity: 0; }
+.los .sz-herz { animation: herzchen 10s ease-out .2s both; }
+@keyframes herzchen {
+  0%, 57% { opacity: 0; transform: translateY(0) scale(.4); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.2); }
+  68% { opacity: 0; transform: translateY(-20px) scale(.8); }
+  100% { opacity: 0; }
+}
+@keyframes hase-hopsen {
+  0.0% { transform: translateY(0px); }
+  2.57% { transform: translateY(-9px); }
+  5.14% { transform: translateY(0px); }
+  7.71% { transform: translateY(-9px); }
+  10.29% { transform: translateY(0px); }
+  12.86% { transform: translateY(-9px); }
+  15.43% { transform: translateY(0px); }
+  18.0% { transform: translateY(-9px); }
+  20.57% { transform: translateY(0px); }
+  23.14% { transform: translateY(-9px); }
+  25.71% { transform: translateY(0px); }
+  28.29% { transform: translateY(-9px); }
+  30.86% { transform: translateY(0px); }
+  33.43% { transform: translateY(-9px); }
+  36.0% { transform: translateY(0px); }
+  63.0% { transform: translateY(0px); }
+  65.64% { transform: translateY(-9px); }
+  68.29% { transform: translateY(0px); }
+  70.93% { transform: translateY(-9px); }
+  73.57% { transform: translateY(0px); }
+  76.21% { transform: translateY(-9px); }
+  78.86% { transform: translateY(0px); }
+  81.5% { transform: translateY(-9px); }
+  84.14% { transform: translateY(0px); }
+  86.79% { transform: translateY(-9px); }
+  89.43% { transform: translateY(0px); }
+  92.07% { transform: translateY(-9px); }
+  94.71% { transform: translateY(0px); }
+  97.36% { transform: translateY(-9px); }
+  100.0% { transform: translateY(0px); }
+}
+@keyframes katze-gehen {
+  0.0% { transform: translateY(0px); }
+  1.62% { transform: translateY(-1.6px); }
+  3.25% { transform: translateY(0px); }
+  4.88% { transform: translateY(-1.6px); }
+  6.5% { transform: translateY(0px); }
+  8.12% { transform: translateY(-1.6px); }
+  9.75% { transform: translateY(0px); }
+  11.38% { transform: translateY(-1.6px); }
+  13.0% { transform: translateY(0px); }
+  14.62% { transform: translateY(-1.6px); }
+  16.25% { transform: translateY(0px); }
+  17.88% { transform: translateY(-1.6px); }
+  19.5% { transform: translateY(0px); }
+  21.12% { transform: translateY(-1.6px); }
+  22.75% { transform: translateY(0px); }
+  24.38% { transform: translateY(-1.6px); }
+  26.0% { transform: translateY(0px); }
+  62.0% { transform: translateY(0px); }
+  63.7% { transform: translateY(-1.6px); }
+  65.4% { transform: translateY(0px); }
+  67.1% { transform: translateY(-1.6px); }
+  68.8% { transform: translateY(0px); }
+  70.5% { transform: translateY(-1.6px); }
+  72.2% { transform: translateY(0px); }
+  73.9% { transform: translateY(-1.6px); }
+  75.6% { transform: translateY(0px); }
+  77.3% { transform: translateY(-1.6px); }
+  79.0% { transform: translateY(0px); }
+  80.7% { transform: translateY(-1.6px); }
+  82.4% { transform: translateY(0px); }
+  84.1% { transform: translateY(-1.6px); }
+  85.8% { transform: translateY(0px); }
+  87.5% { transform: translateY(-1.6px); }
+  89.2% { transform: translateY(0px); }
+  90.9% { transform: translateY(-1.6px); }
+  92.6% { transform: translateY(0px); }
+  94.3% { transform: translateY(-1.6px); }
+  96.0% { transform: translateY(0px); }
+  100.0% { transform: translateY(0px); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

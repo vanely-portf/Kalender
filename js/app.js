@@ -4,6 +4,7 @@
 import * as daten from "./storage.js";
 import { DESIGNS, aktuellesDesign, designAnwenden } from "./designs.js";
 import { ICON, THEME_ICON, MINI_DEKO, statusIcon } from "./icons.js";
+import { SZENEN } from "./szenen.js";
 import {
   STATUS, MONATE, WOCHENTAGE_KURZ, monatsRaster, verfuegbarkeit,
   besteTage, datumLang, datumKurz, heuteIso, ausIso, betrifftTag, isoDatum,
@@ -252,11 +253,27 @@ function renderLegende() {
 function themeDekoRendern() {
   const id = aktuellesDesign();
   const ic = THEME_ICON[id];
-  $("hero-icons").innerHTML = `<span>${ic}</span><span>${ic}</span><span>${ic}</span>`;
+  $("hero-szene").innerHTML = (SZENEN[id] || SZENEN.pastell)();
+  szeneAbspielen(800);
   $("kal-deko-1").innerHTML = ic;
   $("kal-deko-2").innerHTML = ic;
   $("monat-ikon").innerHTML = ic;
   $("einladung-ikon").innerHTML = ic;
+}
+
+/** Header-Szene einmal abspielen (alle 20 Sekunden wiederholt) */
+let szeneTimer;
+function szeneAbspielen(verzoegerung = 0) {
+  clearTimeout(szeneTimer);
+  szeneTimer = setTimeout(() => {
+    const el = $("hero-szene");
+    if (!document.hidden) {
+      el.classList.remove("los");
+      void el.offsetWidth; // Animation neu starten
+      el.classList.add("los");
+    }
+    szeneAbspielen(20000);
+  }, verzoegerung);
 }
 
 /** Platzhalter <span data-icon="…"> mit SVG-Icons füllen */
