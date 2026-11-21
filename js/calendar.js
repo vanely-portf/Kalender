@@ -3,12 +3,12 @@
 // ------------------------------------------------------------
 
 export const STATUS = {
-  frei:     { label: "Frei",        emoji: "✅", farbe: "#16a34a", blockiert: false },
-  besetzt:  { label: "Besetzt",     emoji: "⛔", farbe: "#e11d48", blockiert: true },
-  arbeiten: { label: "Am Arbeiten", emoji: "💼", farbe: "#2563eb", blockiert: true },
-  arzt:     { label: "Arzttermin",  emoji: "🩺", farbe: "#f59e0b", blockiert: false }, // nur blockierend ohne Uhrzeit
-  ferien:   { label: "Ferien",      emoji: "🌴", farbe: "#8b5cf6", blockiert: true },
-  treffen:  { label: "Treffen",     emoji: "🎉", farbe: "#db2777", blockiert: false },
+  frei:     { label: "Frei",        farbe: "#16a34a", blockiert: false },
+  besetzt:  { label: "Besetzt",     farbe: "#e11d48", blockiert: true },
+  arbeiten: { label: "Am Arbeiten", farbe: "#2563eb", blockiert: true },
+  arzt:     { label: "Arzttermin",  farbe: "#f59e0b", blockiert: false }, // nur blockierend ohne Uhrzeit
+  ferien:   { label: "Ferien",      farbe: "#8b5cf6", blockiert: true },
+  treffen:  { label: "Treffen",     farbe: "#db2777", blockiert: false },
 };
 
 export const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni",

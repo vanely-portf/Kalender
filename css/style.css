@@ -32,7 +32,6 @@
   --deko-1: #B3C3D0;
   --deko-2: #EBD9AD;
   --deko-3: #CCDBBB;
-  --deko-emoji: "";
   --heute: #799DAC;
   --heute-text: #fff;
   --gewaehlt: #1F2E45;
@@ -55,322 +54,345 @@
   --backdrop: rgba(31, 46, 69, .35);
 }
 
-/* ---------- Cottagecore ---------- */
-[data-design="cottagecore"] {
-  --bg: #F3E9D2;
-  --bg-muster: radial-gradient(#e6d6b3 1px, transparent 1.5px);
-  --karte: #FFFAEF;
-  --karte-rand: #E7D9BC;
-  --text: #3E4A35;
-  --leise: #7A7F66;
-  --linie: #EADDC2;
-  --feld: #FFFDF6;
-  --tag: #F7EEDC;
-  --tag-hover: #EFE2C6;
-  --weich: #EEF0E1;
-  --weich-2: #E1E6CC;
-  --akzent: #7D9471;
-  --akzent-text: #5E7553;
-  --akzent-2: #E8B4B8;
-  --knopf: #7D9471;
-  --knopf-text: #FFFAEF;
-  --knopf-schatten: 0 8px 18px rgba(94, 117, 83, .25);
-  --hero: linear-gradient(160deg, #8FA582, #6F8763);
-  --hero-text: #FFFAEF;
-  --hero-chip: rgba(255, 250, 239, .25);
-  --deko-1: #E8B4B8;
-  --deko-2: #F3E9D2;
-  --deko-3: #B5835A;
-  --deko-emoji: "🌸 🍄 🌿";
-  --heute: #E8B4B8;
-  --heute-text: #3E4A35;
-  --gewaehlt: #5E6B4E;
-  --gewaehlt-text: #FFFAEF;
-  --wochenende: #C98C91;
-  --gruen-hell: #DCE6C9;
-  --gelb-hell: #F5E1B3;
-  --rot-hell: #F2D0CF;
-  --balken: #7D9471;
-  --radius: 22px;
-  --bogen: 999px 999px 22px 22px;
-  --schatten: 0 6px 22px rgba(94, 107, 78, .10);
-  --font-titel: "Lora", Georgia, serif;
+/* ---------- Melon Soda (Sommer in Japan, Ramune, Quallen) ---------- */
+[data-design="melonsoda"] {
+  --bg: #EAF7EF;
+  --bg-muster: radial-gradient(circle, rgba(159, 221, 235, .35) 1.5px, transparent 2px);
+  --karte: #FBFFFC;
+  --karte-rand: #D3EFE2;
+  --text: #22534A;
+  --leise: #5E8C80;
+  --linie: #D3EDE1;
+  --feld: #F4FCF7;
+  --tag: #EFF9F3;
+  --tag-hover: #DEF3E8;
+  --weich: #DDF4EC;
+  --weich-2: #CBEDE1;
+  --akzent: #5CC8B8;
+  --akzent-text: #2E8F82;
+  --akzent-2: #9FDDEB;
+  --knopf: linear-gradient(135deg, #4DBFA8, #5BB8D6);
+  --knopf-text: #fff;
+  --knopf-schatten: 0 8px 18px rgba(77, 191, 168, .3);
+  --hero: linear-gradient(160deg, #C4F0D3 0%, #A6E6D2 45%, #A5DDF0 100%);
+  --hero-text: #1F4D43;
+  --hero-chip: rgba(255, 255, 255, .5);
+  --deko-1: #FFF8EC;
+  --deko-2: #8EE0C4;
+  --deko-3: #9FDDEB;
+  --heute: #F25C6E;
+  --heute-text: #fff;
+  --gewaehlt: #22534A;
+  --gewaehlt-text: #EAF7EF;
+  --wochenende: #F25C6E;
+  --gruen: #2E8F6A;
+  --gruen-hell: #C9EFD6;
+  --gelb-hell: #F6F1C6;
+  --rot-hell: #FBD7DC;
+  --rot: #D9435A;
+  --balken: #5CC8B8;
+  --mini-deko: #7FD4A6;
+  --radius: 26px;
+  --radius-klein: 16px;
+  --bogen: 999px 999px 16px 16px;
+  --schatten: 0 10px 28px rgba(46, 143, 130, .10);
+  --font-titel: "Fredoka", system-ui, sans-serif;
   --font-text: "Nunito", system-ui, sans-serif;
-  --backdrop: rgba(62, 74, 53, .35);
+  --titel-gewicht: 600;
+  --backdrop: rgba(34, 83, 74, .3);
 }
 
-/* ---------- Cyberpunk ---------- */
-[data-design="cyberpunk"] {
-  --bg: #0D0B1F;
-  --bg-muster: linear-gradient(rgba(5, 217, 232, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(5, 217, 232, .06) 1px, transparent 1px);
-  --karte: #15122E;
-  --karte-rand: rgba(255, 42, 109, .35);
-  --text: #EDEBFF;
-  --leise: #9C97C9;
-  --linie: #2A2550;
-  --feld: #1C1840;
-  --tag: #1C1840;
-  --tag-hover: #262058;
-  --weich: #231E4F;
-  --weich-2: #2E2766;
-  --akzent: #05D9E8;
-  --akzent-text: #05D9E8;
-  --akzent-2: #FF2A6D;
-  --knopf: linear-gradient(90deg, #FF2A6D, #7B2CBF);
+/* ---------- Feenglanz (schillernde Feen & Schmetterlinge) ---------- */
+[data-design="feenglanz"] {
+  --bg: #F5F1FC;
+  --bg-muster: radial-gradient(circle at 15% 10%, rgba(249, 198, 232, .45), transparent 35%), radial-gradient(circle at 85% 40%, rgba(168, 230, 240, .45), transparent 40%), radial-gradient(circle at 30% 85%, rgba(201, 182, 255, .4), transparent 40%);
+  --bg-groesse: 100% 100%;
+  --karte: rgba(255, 255, 255, .78);
+  --karte-rand: rgba(255, 255, 255, .9);
+  --text: #3B2F5C;
+  --leise: #8478A8;
+  --linie: #E8DFF7;
+  --feld: rgba(255, 255, 255, .85);
+  --tag: rgba(246, 241, 255, .9);
+  --tag-hover: #EDE3FF;
+  --weich: #F0E8FF;
+  --weich-2: #E5D8FF;
+  --akzent: #B48CF2;
+  --akzent-text: #8A5BD6;
+  --akzent-2: #F9A8D4;
+  --knopf: linear-gradient(100deg, #F49AC9, #B99BF5 50%, #84D4E8);
   --knopf-text: #fff;
-  --knopf-schatten: 0 0 18px rgba(255, 42, 109, .55);
-  --hero: linear-gradient(135deg, #1B0F3B 0%, #3A0F4F 55%, #0D0B1F 100%);
-  --hero-text: #F9F871;
-  --hero-chip: rgba(5, 217, 232, .15);
-  --deko-1: rgba(255, 42, 109, .55);
-  --deko-2: rgba(5, 217, 232, .45);
-  --deko-3: rgba(249, 248, 113, .35);
-  --deko-emoji: "⚡ ◢◤ ⚡";
-  --heute: #FF2A6D;
+  --knopf-schatten: 0 8px 22px rgba(185, 155, 245, .45), inset 0 1px 0 rgba(255, 255, 255, .6);
+  --hero: linear-gradient(135deg, #F9C6E8 0%, #D9C6FF 38%, #B7E6F2 72%, #F4F6CF 100%);
+  --hero-text: #3B2F5C;
+  --hero-chip: rgba(255, 255, 255, .55);
+  --deko-1: rgba(255, 255, 255, .7);
+  --deko-2: rgba(249, 168, 212, .55);
+  --deko-3: rgba(125, 211, 252, .5);
+  --heute: linear-gradient(135deg, #F49AC9, #84D4E8);
   --heute-text: #fff;
-  --gewaehlt: #05D9E8;
-  --gewaehlt-text: #0D0B1F;
-  --wochenende: #FF2A6D;
+  --gewaehlt: #3B2F5C;
+  --gewaehlt-text: #fff;
+  --wochenende: #D46BB0;
+  --gruen: #2F9E77;
+  --gruen-hell: #D6F5EA;
+  --gelb-hell: #FFF6CC;
+  --rot-hell: #FCD8EE;
+  --rot: #D0457F;
+  --balken: linear-gradient(90deg, #F49AC9, #B99BF5, #84D4E8);
+  --mini-deko: #B48CF2;
+  --radius: 28px;
+  --radius-klein: 18px;
+  --bogen: 999px;
+  --schatten: 0 10px 30px rgba(180, 140, 242, .22);
+  --font-titel: "Playfair Display", Georgia, serif;
+  --font-text: "Quicksand", system-ui, sans-serif;
+  --titel-gewicht: 600;
+  --backdrop: rgba(59, 47, 92, .3);
+}
+
+/* ---------- Brombeernacht (dunkel, Kerzen, Klavier) ---------- */
+[data-design="brombeere"] {
+  --bg: #121016;
+  --bg-muster: radial-gradient(circle at 80% 0%, rgba(142, 90, 158, .18), transparent 45%);
+  --bg-groesse: 100% 100%;
+  --karte: #1C1820;
+  --karte-rand: #2E2733;
+  --text: #EDE5EC;
+  --leise: #A597A9;
+  --linie: #2E2733;
+  --feld: #231E28;
+  --tag: #221D27;
+  --tag-hover: #2D2633;
+  --weich: #2A2231;
+  --weich-2: #352B3D;
+  --akzent: #8E5A9E;
+  --akzent-text: #C79BD6;
+  --akzent-2: #EFE6D8;
+  --knopf: #6B3A7A;
+  --knopf-text: #F3EADC;
+  --knopf-schatten: 0 8px 20px rgba(0, 0, 0, .45);
+  --hero: radial-gradient(circle at 88% 62%, #EFE6D8 0 20px, rgba(239, 230, 216, .22) 21px, transparent 56px), linear-gradient(180deg, #2B1C33 0%, #17121C 100%);
+  --hero-text: #EFE6D8;
+  --hero-chip: rgba(239, 230, 216, .12);
+  --deko-1: #2A1F30;
+  --deko-2: #33263B;
+  --deko-3: #241A2A;
+  --heute: #C79BD6;
+  --heute-text: #121016;
+  --gewaehlt: #EFE6D8;
+  --gewaehlt-text: #121016;
+  --wochenende: #C79BD6;
+  --gruen: #9CCB9F;
+  --gruen-hell: rgba(110, 160, 110, .22);
+  --gelb-hell: rgba(214, 180, 110, .2);
+  --rot-hell: rgba(190, 70, 100, .25);
+  --rot: #E58BA0;
+  --balken: #8E5A9E;
+  --mini-deko: #C79BD6;
+  --radius: 14px;
+  --radius-klein: 10px;
+  --bogen: 999px 999px 8px 8px;
+  --schatten: 0 10px 30px rgba(0, 0, 0, .4);
+  --font-titel: "Cinzel", Georgia, serif;
+  --font-text: "Lora", Georgia, serif;
+  --titel-gewicht: 700;
+  --titel-abstand: .03em;
+  --backdrop: rgba(0, 0, 0, .6);
+}
+
+/* ---------- Neon Tokyo (Cyberpunk) ---------- */
+[data-design="neon"] {
+  --bg: #0A0716;
+  --bg-muster: linear-gradient(rgba(41, 226, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 46, 159, .05) 1px, transparent 1px);
+  --karte: #120D24;
+  --karte-rand: rgba(255, 46, 159, .45);
+  --text: #F3EAFF;
+  --leise: #A99BD0;
+  --linie: #2A2050;
+  --feld: #1A1335;
+  --tag: #1A1335;
+  --tag-hover: #251B4A;
+  --weich: #211843;
+  --weich-2: #2C2058;
+  --akzent: #29E2FF;
+  --akzent-text: #29E2FF;
+  --akzent-2: #FF2E9F;
+  --knopf: linear-gradient(90deg, #FF2E9F, #8B2CF5);
+  --knopf-text: #fff;
+  --knopf-schatten: 0 0 18px rgba(255, 46, 159, .55);
+  --hero: linear-gradient(135deg, #1A0B33 0%, #43094E 50%, #0A0716 100%);
+  --hero-text: #FFE8F6;
+  --hero-chip: rgba(41, 226, 255, .14);
+  --deko-1: rgba(255, 46, 159, .5);
+  --deko-2: rgba(41, 226, 255, .4);
+  --deko-3: rgba(139, 44, 245, .5);
+  --heute: #FF2E9F;
+  --heute-text: #fff;
+  --gewaehlt: #29E2FF;
+  --gewaehlt-text: #0A0716;
+  --wochenende: #FF2E9F;
   --gruen: #3DFFB0;
-  --gruen-hell: rgba(61, 255, 176, .18);
-  --gelb-hell: rgba(249, 248, 113, .16);
-  --rot-hell: rgba(255, 42, 109, .2);
-  --rot: #FF2A6D;
-  --balken: #3DFFB0;
+  --gruen-hell: rgba(61, 255, 176, .16);
+  --gelb-hell: rgba(249, 248, 113, .14);
+  --rot-hell: rgba(255, 46, 159, .2);
+  --rot: #FF5CB0;
+  --balken: linear-gradient(90deg, #FF2E9F, #29E2FF);
+  --mini-deko: #F9F871;
   --radius: 10px;
   --radius-klein: 6px;
-  --bogen: 10px;
-  --schatten: 0 0 0 1px rgba(255, 42, 109, .25), 0 0 24px rgba(123, 44, 191, .25);
+  --bogen: 6px;
+  --schatten: 0 0 0 1px rgba(255, 46, 159, .2), 0 0 26px rgba(139, 44, 245, .28);
   --font-titel: "Orbitron", system-ui, sans-serif;
   --font-text: "Space Grotesk", system-ui, sans-serif;
   --titel-gewicht: 800;
   --titel-abstand: .04em;
-  --backdrop: rgba(5, 3, 20, .7);
+  --backdrop: rgba(5, 3, 15, .7);
 }
 
-/* ---------- Japandi ---------- */
-[data-design="japandi"] {
-  --bg: #EFEBE4;
-  --karte: #F8F6F2;
-  --karte-rand: #E0D9CE;
-  --text: #3B3833;
-  --leise: #857D72;
-  --linie: #E2DBD0;
-  --feld: #FBFAF7;
-  --tag: #F1EDE6;
-  --tag-hover: #E6E0D6;
-  --weich: #E8E4DC;
-  --weich-2: #DDD6CA;
-  --akzent: #8A9A8B;
-  --akzent-text: #66766A;
-  --akzent-2: #A68A6D;
-  --knopf: #3B3833;
-  --knopf-text: #F8F6F2;
-  --knopf-schatten: none;
-  --hero: #D8CFC2;
-  --hero-text: #3B3833;
-  --hero-chip: rgba(59, 56, 51, .08);
-  --deko-1: #A68A6D;
-  --deko-2: #8A9A8B;
-  --deko-3: #EFEBE4;
-  --deko-emoji: "";
-  --heute: #A68A6D;
-  --heute-text: #fff;
-  --gewaehlt: #3B3833;
-  --gewaehlt-text: #F8F6F2;
-  --wochenende: #A68A6D;
-  --gruen-hell: #DCE2D8;
-  --gelb-hell: #EDE3CF;
-  --rot-hell: #EBD8CF;
-  --balken: #8A9A8B;
-  --radius: 8px;
-  --radius-klein: 6px;
-  --bogen: 50% 50% 6px 6px;
-  --schatten: none;
-  --font-titel: "Shippori Mincho", Georgia, serif;
-  --font-text: "Inter", system-ui, sans-serif;
-  --titel-gewicht: 600;
-  --backdrop: rgba(59, 56, 51, .3);
-}
-
-/* ---------- Boho ---------- */
-[data-design="boho"] {
-  --bg: #EFE2D0;
-  --karte: #FBF4EA;
-  --karte-rand: #E6D3BA;
-  --text: #4A3426;
-  --leise: #8A6F5C;
-  --linie: #EAD9C3;
-  --feld: #FFF9F1;
-  --tag: #F5EADB;
-  --tag-hover: #EDDCC6;
-  --weich: #F3DFD3;
-  --weich-2: #EBCDBC;
-  --akzent: #C8775A;
-  --akzent-text: #A85C40;
-  --akzent-2: #D9A441;
-  --knopf: #C8775A;
-  --knopf-text: #FBF4EA;
-  --knopf-schatten: 0 8px 18px rgba(200, 119, 90, .28);
-  --hero: linear-gradient(180deg, #D98B6C 0%, #C8775A 60%, #B7684D 100%);
-  --hero-text: #FBF4EA;
-  --hero-chip: rgba(251, 244, 234, .22);
-  --deko-1: #D9A441;
-  --deko-2: #EFE2D0;
-  --deko-3: #6B7A4F;
-  --deko-emoji: "🌾 ☀️ 🌵";
-  --heute: #D9A441;
-  --heute-text: #4A3426;
-  --gewaehlt: #4A3426;
-  --gewaehlt-text: #FBF4EA;
-  --wochenende: #C8775A;
-  --gruen-hell: #DDE0C4;
-  --gelb-hell: #F2DDB0;
-  --rot-hell: #F0CDBF;
-  --balken: #6B7A4F;
-  --radius: 20px;
-  --bogen: 999px 999px 16px 16px;
-  --schatten: 0 8px 24px rgba(74, 52, 38, .08);
-  --font-titel: "DM Serif Display", Georgia, serif;
-  --font-text: "Josefin Sans", system-ui, sans-serif;
-  --titel-gewicht: 400;
-  --backdrop: rgba(74, 52, 38, .35);
-}
-
-/* ---------- Light Academia ---------- */
-[data-design="academia"] {
-  --bg: #F4EEE2;
-  --bg-muster: linear-gradient(rgba(107, 79, 58, .035) 1px, transparent 1px);
-  --karte: #FBF7EF;
-  --karte-rand: #DDCFB6;
-  --text: #2E2A24;
-  --leise: #7A6A58;
-  --linie: #E3D7C2;
-  --feld: #FFFCF5;
-  --tag: #F5EEE1;
-  --tag-hover: #EBE0CC;
-  --weich: #EEE5D3;
-  --weich-2: #E3D6BD;
-  --akzent: #B8975A;
-  --akzent-text: #8C6E36;
-  --akzent-2: #6B4F3A;
-  --knopf: #6B4F3A;
-  --knopf-text: #FBF7EF;
-  --knopf-schatten: 0 6px 14px rgba(107, 79, 58, .22);
-  --hero: linear-gradient(180deg, #7A5D47, #5E4433);
-  --hero-text: #F4EEE2;
-  --hero-chip: rgba(244, 238, 226, .18);
-  --deko-1: #B8975A;
-  --deko-2: #A3A38B;
-  --deko-3: #F4EEE2;
-  --deko-emoji: "📚 🕯️ ✒️";
-  --heute: #B8975A;
-  --heute-text: #fff;
-  --gewaehlt: #2E2A24;
-  --gewaehlt-text: #F4EEE2;
-  --wochenende: #8C6E36;
-  --gruen-hell: #DFE0CC;
-  --gelb-hell: #EFE0BE;
-  --rot-hell: #EBD3C6;
-  --balken: #A3A38B;
+/* ---------- Kerzenschein (Dark Vintage, Spitze, Rosen) ---------- */
+[data-design="kerze"] {
+  --bg: #221812;
+  --bg-muster: radial-gradient(circle at 50% -10%, rgba(245, 185, 66, .14), transparent 50%);
+  --bg-groesse: 100% 100%;
+  --karte: #31231A;
+  --karte-rand: #4A3627;
+  --text: #F1E6D2;
+  --leise: #C2AC8D;
+  --linie: #4A3627;
+  --feld: #3A2A1F;
+  --tag: #3A2A1F;
+  --tag-hover: #4A3527;
+  --weich: #45311F;
+  --weich-2: #523A26;
+  --akzent: #C9A15B;
+  --akzent-text: #E2BE78;
+  --akzent-2: #8E2B2B;
+  --knopf: #8E2B2B;
+  --knopf-text: #F6E9CF;
+  --knopf-schatten: 0 8px 18px rgba(0, 0, 0, .4);
+  --hero: linear-gradient(180deg, #5C3B26 0%, #3A271B 70%, #2E1F16 100%);
+  --hero-text: #F6E9CF;
+  --hero-chip: rgba(246, 233, 207, .14);
+  --deko-1: #4A3021;
+  --deko-2: #6B2424;
+  --deko-3: #3F2A1D;
+  --heute: #C9A15B;
+  --heute-text: #221812;
+  --gewaehlt: #F1E6D2;
+  --gewaehlt-text: #221812;
+  --wochenende: #E2BE78;
+  --gruen: #B9CC8F;
+  --gruen-hell: rgba(150, 170, 100, .24);
+  --gelb-hell: rgba(201, 161, 91, .26);
+  --rot-hell: rgba(142, 43, 43, .45);
+  --rot: #E89383;
+  --balken: #C9A15B;
+  --mini-deko: #F5B942;
   --radius: 6px;
   --radius-klein: 4px;
   --bogen: 999px 999px 4px 4px;
-  --schatten: 0 1px 0 #E3D7C2, 0 6px 18px rgba(46, 42, 36, .06);
-  --font-titel: "Cormorant Garamond", Georgia, serif;
+  --schatten: 0 10px 28px rgba(0, 0, 0, .35);
+  --font-titel: "IM Fell English", Georgia, serif;
   --font-text: "EB Garamond", Georgia, serif;
-  --titel-gewicht: 700;
-  --backdrop: rgba(46, 42, 36, .35);
+  --titel-gewicht: 400;
+  --backdrop: rgba(10, 6, 4, .6);
 }
 
-/* ---------- Y2K ---------- */
-[data-design="y2k"] {
-  --bg: #F3F0FF;
-  --bg-muster: radial-gradient(circle at 20% 10%, rgba(255, 95, 207, .12), transparent 40%), radial-gradient(circle at 90% 60%, rgba(122, 211, 255, .15), transparent 45%);
-  --karte: rgba(255, 255, 255, .85);
-  --karte-rand: #FFFFFF;
-  --text: #2B1B4D;
-  --leise: #7E6BA8;
-  --linie: #E9E1FF;
-  --feld: #FFFFFF;
-  --tag: #F6F2FF;
-  --tag-hover: #ECE4FF;
-  --weich: #F0E6FF;
-  --weich-2: #E4D4FF;
-  --akzent: #FF5FCF;
-  --akzent-text: #D63FAA;
-  --akzent-2: #7AD3FF;
-  --knopf: linear-gradient(90deg, #FF5FCF, #C9A7FF 50%, #7AD3FF);
-  --knopf-text: #fff;
-  --knopf-schatten: 0 8px 20px rgba(255, 95, 207, .35), inset 0 1px 0 rgba(255,255,255,.6);
-  --hero: linear-gradient(135deg, #FF9BE0 0%, #C9A7FF 45%, #7AD3FF 100%);
-  --hero-text: #fff;
-  --hero-chip: rgba(255, 255, 255, .35);
-  --deko-1: rgba(255, 240, 106, .8);
-  --deko-2: rgba(255, 255, 255, .55);
-  --deko-3: rgba(255, 95, 207, .5);
-  --deko-emoji: "🦋 ✦ 💿 ✦";
-  --heute: linear-gradient(135deg, #FF5FCF, #7AD3FF);
+/* ---------- Teestunde (Cottagecore, Blümchen, Tee) ---------- */
+[data-design="tee"] {
+  --bg: #F7F1E6;
+  --bg-muster: radial-gradient(circle, rgba(217, 160, 168, .28) 1.4px, transparent 1.8px), radial-gradient(circle, rgba(168, 184, 154, .28) 1.4px, transparent 1.8px);
+  --bg-groesse: 26px 26px;
+  --karte: #FFFCF6;
+  --karte-rand: #EFE4D3;
+  --text: #4B4038;
+  --leise: #8C7F72;
+  --linie: #EEE3D2;
+  --feld: #FFFDF8;
+  --tag: #FAF4EA;
+  --tag-hover: #F3EADB;
+  --weich: #F7E8E6;
+  --weich-2: #F1D9D8;
+  --akzent: #D9A0A8;
+  --akzent-text: #A8606C;
+  --akzent-2: #A8B89A;
+  --knopf: #B26E7A;
+  --knopf-text: #FFFCF6;
+  --knopf-schatten: 0 8px 18px rgba(178, 110, 122, .25);
+  --hero: linear-gradient(180deg, #F6DDE0 0%, #F1DCCF 100%);
+  --hero-text: #4B4038;
+  --hero-chip: rgba(255, 252, 246, .6);
+  --deko-1: #FFFCF6;
+  --deko-2: #C9D6BC;
+  --deko-3: #E8B9BF;
+  --heute: #A8B89A;
   --heute-text: #fff;
-  --gewaehlt: #2B1B4D;
-  --gewaehlt-text: #fff;
-  --wochenende: #FF5FCF;
-  --gruen-hell: #D2F7E4;
-  --gelb-hell: #FFF6B8;
-  --rot-hell: #FFD6EE;
-  --balken: #7AD3FF;
-  --radius: 28px;
-  --radius-klein: 18px;
-  --bogen: 999px;
-  --schatten: 0 10px 30px rgba(201, 167, 255, .3);
-  --font-titel: "Righteous", system-ui, sans-serif;
-  --font-text: "Comfortaa", system-ui, sans-serif;
-  --titel-gewicht: 400;
-  --backdrop: rgba(43, 27, 77, .35);
+  --gewaehlt: #4B4038;
+  --gewaehlt-text: #FFFCF6;
+  --wochenende: #B26E7A;
+  --gruen: #6E8A5E;
+  --gruen-hell: #E1EAD6;
+  --gelb-hell: #F6E8C8;
+  --rot-hell: #F6D6D9;
+  --rot: #B5525F;
+  --balken: #A8B89A;
+  --mini-deko: #D9A0A8;
+  --radius: 22px;
+  --radius-klein: 14px;
+  --bogen: 999px 999px 14px 14px;
+  --schatten: 0 8px 24px rgba(75, 64, 56, .07);
+  --font-titel: "Lora", Georgia, serif;
+  --font-text: "Nunito", system-ui, sans-serif;
+  --titel-gewicht: 600;
+  --backdrop: rgba(75, 64, 56, .3);
 }
 
-/* ---------- Retro 70s ---------- */
-[data-design="retro"] {
-  --bg: #FBEEDB;
-  --karte: #FFF7EA;
-  --karte-rand: #6B3E26;
-  --text: #4A2A19;
-  --leise: #8A5E43;
-  --linie: #F0D9B8;
-  --feld: #FFFBF3;
-  --tag: #FBEAD0;
-  --tag-hover: #F6DDB7;
-  --weich: #FCE3C2;
-  --weich-2: #F8D3A3;
-  --akzent: #E76F30;
-  --akzent-text: #C4531A;
-  --akzent-2: #2A9D8F;
-  --knopf: #E76F30;
-  --knopf-text: #FFF7EA;
-  --knopf-schatten: 4px 4px 0 #6B3E26;
-  --hero: repeating-linear-gradient(180deg, #E76F30 0 22px, #F2B134 22px 44px, #2A9D8F 44px 66px, #6B3E26 66px 88px);
-  --hero-text: #FFF7EA;
-  --hero-chip: rgba(74, 42, 25, .35);
-  --deko-1: #F2B134;
-  --deko-2: #FBEEDB;
-  --deko-3: #2A9D8F;
-  --deko-emoji: "🪩 ✌️ 🌼";
-  --heute: #2A9D8F;
-  --heute-text: #FFF7EA;
-  --gewaehlt: #6B3E26;
-  --gewaehlt-text: #FFF7EA;
-  --wochenende: #E76F30;
-  --gruen-hell: #CFE7D9;
-  --gelb-hell: #FBE0A6;
-  --rot-hell: #F8C9B0;
-  --balken: #2A9D8F;
-  --radius: 18px;
-  --bogen: 999px 999px 0 0;
-  --schatten: 4px 4px 0 #6B3E26;
-  --font-titel: "Shrikhand", Georgia, serif;
-  --font-text: "Work Sans", system-ui, sans-serif;
+/* ---------- Kirschpudding (Coquette, Kirschen, Schleifen) ---------- */
+[data-design="pudding"] {
+  --bg: #F8EDE6;
+  --karte: #FFF8F3;
+  --karte-rand: #F1DCD3;
+  --text: #4A2328;
+  --leise: #94686B;
+  --linie: #F0DAD2;
+  --feld: #FFFBF8;
+  --tag: #FBF1EB;
+  --tag-hover: #F5E2DA;
+  --weich: #F8E1DE;
+  --weich-2: #F2CFCB;
+  --akzent: #B3263A;
+  --akzent-text: #A11E31;
+  --akzent-2: #F2C27A;
+  --knopf: #A11E31;
+  --knopf-text: #FFF8F3;
+  --knopf-schatten: 0 8px 18px rgba(161, 30, 49, .25);
+  --hero: linear-gradient(180deg, #EBC3BE 0%, #DCA7A3 100%);
+  --hero-text: #4A2328;
+  --hero-chip: rgba(255, 248, 243, .55);
+  --deko-1: #FFF8F3;
+  --deko-2: #F2C27A;
+  --deko-3: #C9505E;
+  --heute: #B3263A;
+  --heute-text: #fff;
+  --gewaehlt: #4A2328;
+  --gewaehlt-text: #FFF8F3;
+  --wochenende: #B3263A;
+  --gruen: #5E8150;
+  --gruen-hell: #E4ECD6;
+  --gelb-hell: #F7E3C2;
+  --rot-hell: #F5CED1;
+  --rot: #A11E31;
+  --balken: #C9505E;
+  --mini-deko: #B3263A;
+  --radius: 20px;
+  --radius-klein: 14px;
+  --bogen: 999px 999px 14px 14px;
+  --schatten: 0 8px 24px rgba(74, 35, 40, .08);
+  --font-titel: "DM Serif Display", Georgia, serif;
+  --font-text: "Karla", system-ui, sans-serif;
   --titel-gewicht: 400;
-  --backdrop: rgba(74, 42, 25, .4);
+  --backdrop: rgba(74, 35, 40, .3);
 }
 
 /* ============================================================
@@ -387,7 +409,8 @@ body {
   margin: 0;
   background-color: var(--bg);
   background-image: var(--bg-muster, none);
-  background-size: 18px 18px;
+  background-size: var(--bg-groesse, 18px 18px);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-text);
   font-size: 16px;
@@ -434,11 +457,6 @@ h3 {
   position: absolute; right: 210px; bottom: -10px;
   width: 70px; height: 92px; border-radius: var(--bogen);
   background: var(--deko-3); opacity: .9; transform: translateY(40px);
-}
-.hero-emoji::after {
-  content: var(--deko-emoji);
-  position: absolute; left: 1.3rem; bottom: 4.2rem;
-  font-size: 1.1rem; letter-spacing: .3rem; opacity: .95;
 }
 .hero-zeile, .gruss, .gruss-unter { max-width: 560px; margin-left: auto; margin-right: auto; position: relative; z-index: 1; }
 .hero-zeile { display: flex; align-items: center; justify-content: space-between; }
@@ -608,7 +626,6 @@ main > .karte:nth-of-type(4) { animation-delay: .15s; }
 }
 
 .leer-hinweis { color: var(--leise); font-size: .9rem; padding: 1rem 0 .5rem; text-align: center; line-height: 1.5; }
-.leer-emoji { display: block; font-size: 2.3rem; margin-bottom: .3rem; animation: schweben 3s ease-in-out infinite; }
 @keyframes schweben { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
 /* Gäste & Einladungen */
@@ -639,7 +656,6 @@ main > .karte:nth-of-type(4) { animation-delay: .15s; }
   border-radius: var(--radius-klein); padding: .75rem .9rem; text-align: left;
 }
 .beste-tag:hover { background: var(--weich); }
-.medaille { font-size: 1.4rem; }
 .beste-text { flex: 1; display: grid; gap: .4rem; min-width: 0; }
 .beste-datum { font-size: .9rem; font-weight: 600; }
 .balken { height: 6px; background: var(--linie); border-radius: 99px; overflow: hidden; }
@@ -788,7 +804,6 @@ legend { font-size: .85rem; font-weight: 700; margin-bottom: .55rem; padding: 0;
 .popup[open] { animation: popup-rein .4s var(--federnd); }
 @keyframes popup-rein { from { opacity: 0; transform: scale(.85) translateY(20px); } to { opacity: 1; transform: none; } }
 .popup-inhalt { padding: 1.6rem 1.25rem 1.15rem; display: grid; gap: .85rem; text-align: center; }
-.popup-emoji { font-size: 3rem; line-height: 1; animation: schweben 2.5s ease-in-out infinite; }
 .popup h2 { margin: 0; font-size: 1.4rem; }
 .popup-text { margin: 0; color: var(--leise); font-size: .92rem; }
 .einladung-karte {
@@ -802,6 +817,7 @@ legend { font-size: .85rem; font-weight: 700; margin-bottom: .55rem; padding: 0;
    Toast & Konfetti
    ============================================================ */
 .toast {
+  display: inline-flex; align-items: center; gap: .4rem;
   position: fixed; left: 50%; bottom: calc(1.4rem + env(safe-area-inset-bottom));
   transform: translate(-50%, 160%) scale(.9); opacity: 0;
   background: var(--knopf); color: var(--knopf-text); padding: .85rem 1.35rem; border-radius: 999px;
@@ -813,7 +829,8 @@ legend { font-size: .85rem; font-weight: 700; margin-bottom: .55rem; padding: 0;
 .toast.fehler-toast { background: var(--rot); color: #fff; }
 
 .konfetti { position: fixed; left: 50%; bottom: 5rem; z-index: 60; pointer-events: none; }
-.konfetti span { position: absolute; font-size: 1.3rem; opacity: 0; }
+.konfetti span { position: absolute; width: 24px; height: 24px; opacity: 0; }
+.konfetti span i, .konfetti span svg { display: block; width: 100%; height: 100%; }
 .konfetti.los span { animation: knall 1s var(--d) cubic-bezier(.2, .8, .3, 1) both; }
 @keyframes knall {
   0% { opacity: 1; transform: translate(0, 0) scale(.4) rotate(0); }
@@ -822,24 +839,124 @@ legend { font-size: .85rem; font-weight: 700; margin-bottom: .55rem; padding: 0;
 }
 
 /* ============================================================
+   Icons
+   ============================================================ */
+.ic { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.18em; }
+.ti { width: 100%; height: 100%; display: block; }
+.badge .ic { width: 1em; height: 1em; }
+.status-chip .ic { width: 1.05em; height: 1.05em; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; }
+.icon-btn .ic { width: 1.05rem; height: 1.05rem; }
+.icon-btn.sicher .ic { display: none; }
+.nav-btn, .schliessen-btn { display: inline-flex; align-items: center; justify-content: center; }
+.nav-btn .ic { width: 1.25rem; height: 1.25rem; }
+.schliessen-btn .ic { width: 1rem; height: 1rem; }
+h2 .ic { color: var(--akzent-text); margin-right: .25rem; width: 1.05em; height: 1.05em; }
+legend .ic, .antwort-zeile .ic, .gaeste > .ic { color: var(--akzent-text); margin-right: .2rem; }
+.leer-ikon { display: inline-flex; width: 3rem; height: 3rem; border-radius: 50%; align-items: center; justify-content: center; background: var(--weich); color: var(--akzent-text); margin-bottom: .5rem; animation: schweben 3s ease-in-out infinite; }
+.leer-ikon .ic { width: 1.4rem; height: 1.4rem; }
+.popup-ikon { justify-self: center; width: 4.2rem; height: 4.2rem; padding: .7rem; border-radius: 50%; background: var(--weich); animation: schweben 2.5s ease-in-out infinite; }
+.popup-ikon.linie { color: var(--akzent-text); display: inline-flex; align-items: center; justify-content: center; }
+.popup-ikon.linie .ic { width: 1.8rem; height: 1.8rem; }
+.platz {
+  width: 1.9rem; height: 1.9rem; flex: none; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: .85rem; background: var(--weich); color: var(--akzent-text);
+}
+.platz.p1 { background: var(--knopf); color: var(--knopf-text); }
+
+/* Kopfbereich: Theme-Symbole */
+.hero-icons { position: absolute; left: 1.2rem; bottom: 4.1rem; display: flex; gap: .45rem; z-index: 1; }
+.hero-icons span { width: 30px; height: 30px; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.12)); animation: schweben 4s ease-in-out infinite; }
+.hero-icons span:nth-child(2) { width: 22px; height: 22px; margin-top: 10px; animation-delay: .7s; }
+.hero-icons span:nth-child(3) { width: 26px; height: 26px; margin-top: 2px; animation-delay: 1.4s; }
+
+/* Kalender: Deko pro Theme */
+.kalender { position: relative; overflow: hidden; }
+.kal-deko { position: absolute; pointer-events: none; opacity: .14; z-index: 0; }
+.kal-deko.gross { width: 120px; height: 120px; right: -26px; bottom: -22px; transform: rotate(-12deg); }
+.kal-deko.klein { width: 46px; height: 46px; left: -10px; top: 58px; transform: rotate(14deg); opacity: .1; }
+.kalender > *:not(.kal-deko) { position: relative; z-index: 1; }
+.monat-ikon { display: inline-block; width: 1.3rem; height: 1.3rem; vertical-align: .05em; margin-left: .35rem; }
+.tag .mini-deko { position: absolute; top: 4px; right: 4px; width: 9px; height: 9px; color: var(--mini-deko, var(--akzent)); }
+.tag .mini-deko svg { width: 100%; height: 100%; display: block; }
+.tag.gewaehlt .mini-deko { color: var(--gewaehlt-text); }
+
+/* Design-Auswahl */
+.design-name .design-ikon { margin-left: auto; width: 26px; height: 26px; flex: none; }
+
+/* ============================================================
+   Auswahlfelder (Uhrzeit / Datum) mit Scroll-Rad
+   ============================================================ */
+.feld-gruppe { display: grid; gap: .35rem; }
+.feld-label { font-size: .85rem; font-weight: 700; }
+.wahl-feld {
+  display: flex; align-items: center; gap: .5rem; width: 100%;
+  font-size: 1rem; text-align: left; color: var(--text);
+  padding: .75rem .9rem; min-height: 2.9rem;
+  border: 1.5px solid var(--linie); border-radius: var(--radius-klein); background: var(--feld);
+}
+.wahl-feld .ic { color: var(--akzent-text); }
+.wahl-feld.leer span { color: var(--leise); }
+.wahl-feld:focus-visible { outline: 0; border-color: var(--akzent); }
+
+.rad-inhalt { padding: .7rem 1.2rem calc(1.2rem + env(safe-area-inset-bottom)); display: grid; gap: 1rem; }
+.rad-inhalt h2 { margin: 0; font-size: 1.35rem; }
+.raeder { position: relative; display: flex; gap: .4rem; justify-content: center; height: 220px; }
+.raeder::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%);
+  border-radius: var(--radius-klein); background: var(--weich); pointer-events: none;
+}
+.rad {
+  position: relative; flex: 1; max-width: 120px; height: 100%;
+  overflow-y: scroll; scroll-snap-type: y mandatory; overscroll-behavior: contain;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+          mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+}
+.rad::-webkit-scrollbar { display: none; }
+.rad-polster { height: 88px; }
+.rad-item {
+  height: 44px; display: flex; align-items: center; justify-content: center;
+  scroll-snap-align: center; font-size: 1.3rem; font-weight: 600; color: var(--leise);
+  font-variant-numeric: tabular-nums; cursor: pointer; transition: color .15s, transform .15s;
+}
+.rad-item.aktiv { color: var(--text); transform: scale(1.08); }
+.rad.breit { max-width: 150px; }
+#rad-leeren[hidden] + #rad-ok { grid-column: 1 / -1; }
+.wahl-feld span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rad-trenner { align-self: center; font-size: 1.4rem; font-weight: 700; position: relative; z-index: 1; }
+
+/* ============================================================
    Design-Extras
    ============================================================ */
-[data-design="cyberpunk"] .monat,
-[data-design="cyberpunk"] .gruss { text-shadow: 0 0 12px rgba(255, 42, 109, .6); }
-[data-design="cyberpunk"] .tag.heute .nr { box-shadow: 0 0 12px #FF2A6D; }
-[data-design="cyberpunk"] .tag.gewaehlt { box-shadow: 0 0 16px rgba(5, 217, 232, .7); }
-[data-design="cyberpunk"] .karte { backdrop-filter: blur(6px); }
-[data-design="cyberpunk"] .avatar { color: #0D0B1F; }
-[data-design="cyberpunk"] input::-webkit-calendar-picker-indicator { filter: invert(1); }
-[data-design="y2k"] .karte { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-[data-design="y2k"] .gruss { text-shadow: 0 2px 0 rgba(255, 95, 207, .5); }
-[data-design="retro"] .gruss { text-shadow: 3px 3px 0 #6B3E26; }
-[data-design="retro"] .hero { border-bottom: 4px solid #6B3E26; }
-[data-design="retro"] .tag.gewaehlt { box-shadow: 3px 3px 0 #E76F30; }
-[data-design="academia"] .monat { font-style: italic; }
-[data-design="academia"] .karte h2::after { content: " ❦"; color: var(--akzent); font-size: .9em; }
-[data-design="japandi"] .hero { border-radius: 0; }
-[data-design="japandi"] .gruss { font-size: 1.7rem; }
+[data-design="neon"] .monat, [data-design="neon"] .gruss { text-shadow: 0 0 12px rgba(255, 46, 159, .65); }
+[data-design="neon"] .tag.heute .nr { box-shadow: 0 0 12px #FF2E9F; }
+[data-design="neon"] .tag.gewaehlt { box-shadow: 0 0 16px rgba(41, 226, 255, .7); }
+[data-design="neon"] .karte { backdrop-filter: blur(6px); }
+[data-design="neon"] .kal-deko { opacity: .22; }
+[data-design="neon"] .hero::before, [data-design="neon"] .hero::after, [data-design="neon"] .hero-deko { opacity: .35; border: 1.5px solid #FF2E9F; box-shadow: 0 0 14px rgba(255, 46, 159, .6); }
+[data-design="brombeere"] .hero::after { display: none; }
+[data-design="feenglanz"] .karte { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+[data-design="feenglanz"] .gruss { text-shadow: 0 0 18px rgba(255, 255, 255, .9); }
+[data-design="feenglanz"] .tag.heute .nr { box-shadow: 0 0 12px rgba(244, 154, 201, .8); }
+[data-design="feenglanz"] .kal-deko { opacity: .3; }
+[data-design="brombeere"] .gruss, [data-design="kerze"] .gruss { text-shadow: 0 2px 10px rgba(0, 0, 0, .45); }
+[data-design="brombeere"] .kal-deko, [data-design="kerze"] .kal-deko { opacity: .2; }
+[data-design="kerze"] .monat { font-style: italic; }
+[data-design="kerze"] .hero { box-shadow: inset 0 -14px 0 -8px rgba(241, 230, 210, .08); }
+/* Spitzenkante unten am Kopfbereich */
+[data-design="kerze"] .hero::after, [data-design="tee"] .hero::after, [data-design="pudding"] .hero::after {
+  width: 100%; height: 14px; right: 0; bottom: 0; transform: none; border-radius: 0; opacity: 1;
+  background: radial-gradient(circle at 7px 0, transparent 6px, var(--spitze) 6.5px) 0 0 / 14px 14px repeat-x;
+}
+[data-design="kerze"] { --spitze: rgba(241, 230, 210, .18); }
+[data-design="tee"] { --spitze: rgba(255, 252, 246, .9); }
+[data-design="pudding"] { --spitze: rgba(255, 248, 243, .85); }
+[data-design="tee"] .hero, [data-design="pudding"] .hero, [data-design="kerze"] .hero { border-radius: 0 0 22px 22px; }
+[data-design="tee"] .monat { font-style: italic; }
+[data-design="pudding"] .tag.heute .nr { box-shadow: 0 0 0 2px #FFF8F3, 0 0 0 3.5px #B3263A; }
+[data-design="melonsoda"] .tag.heute .nr { box-shadow: 0 3px 8px rgba(242, 92, 110, .4); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

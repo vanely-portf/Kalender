@@ -3,9 +3,10 @@
 // ------------------------------------------------------------
 import * as daten from "./storage.js";
 import { DESIGNS, aktuellesDesign, designAnwenden } from "./designs.js";
+import { ICON, THEME_ICON, MINI_DEKO, statusIcon } from "./icons.js";
 import {
   STATUS, MONATE, WOCHENTAGE_KURZ, monatsRaster, verfuegbarkeit,
-  besteTage, datumLang, datumKurz, heuteIso, ausIso, betrifftTag,
+  besteTage, datumLang, datumKurz, heuteIso, ausIso, betrifftTag, isoDatum,
 } from "./calendar.js";
 
 const FARBEN = ["#e5484d", "#f97316", "#eab308", "#22a55b", "#14b8a6",
@@ -71,7 +72,8 @@ function avatar(name, farbe, klasse = "") {
 }
 function konfetti() {
   const box = $("konfetti");
-  const teile = ["🎉", "✨", "🎈", "💚", "⭐"];
+  const id = aktuellesDesign();
+  const teile = [THEME_ICON[id], `<i style="color:var(--mini-deko, var(--akzent))">${MINI_DEKO[id]}</i>`];
   box.innerHTML = Array.from({ length: 14 }, (_, i) => {
     const w = (i / 14) * Math.PI * 2;
     const r = 90 + Math.random() * 70;
@@ -109,11 +111,11 @@ function renderKopf() {
     p.style.setProperty("--p", app.ich.farbe);
     p.textContent = initialen(app.ich.name);
     p.hidden = false;
-    $("gruss").textContent = `${tageszeit}, ${app.ich.name}! 👋`;
+    $("gruss").textContent = `${tageszeit}, ${app.ich.name}!`;
   } else {
     $("profil-name").textContent = "Name eingeben";
     p.hidden = true;
-    $("gruss").textContent = `${tageszeit}! 👋`;
+    $("gruss").textContent = `${tageszeit}!`;
   }
   const n = app.personen.length;
   $("gruss-unter").textContent = n
@@ -139,8 +141,9 @@ function renderRaster() {
       iso === heute ? "heute" : "",
       iso === app.gewaehlt ? "gewaehlt" : "",
       iso < heute ? "vergangen" : ""].join(" ");
+    const deko = stufe === "alle" ? `<span class="mini-deko" aria-hidden="true">${MINI_DEKO[aktuellesDesign()]}</span>` : "";
     return `<button type="button" class="${klassen}" data-iso="${iso}" aria-label="${datumLang(iso)}">
-      <span class="nr">${ausIso(iso).getDate()}</span>
+      ${deko}<span class="nr">${ausIso(iso).getDate()}</span>
       <span class="punkte">${punkte}</span>
     </button>`;
   }).join("");
@@ -157,23 +160,23 @@ function eintragHtml(e, mitDatum, i = 0) {
   const antworten = e.antworten || {};
   const ichEingeladen = app.ich && eingeladen.includes(app.ich.name);
   const gaeste = eingeladen.length
-    ? `<div class="gaeste">👥 ${eingeladen.map((n) => {
+    ? `<div class="gaeste">${ICON.leute} ${eingeladen.map((n) => {
         const a = antworten[n];
         const zeichen = a === "ja" ? "✓" : a === "nein" ? "✗" : "?";
         return `<span class="gast ${a || "offen"}" title="${esc(n)}">${avatar(n, farbeVon(n), "mini-av")}<b>${zeichen}</b></span>`;
       }).join("")}</div>` : "";
   const antwortKnoepfe = ichEingeladen && !antworten[app.ich.name]
     ? `<div class="antwort-zeile">
-        <span>📩 Du bist eingeladen!</span>
-        <button type="button" class="mini-btn nein" data-antwort="nein" data-id="${e.id}">✗ Absagen</button>
-        <button type="button" class="mini-btn ja" data-antwort="ja" data-id="${e.id}">✓ Zusagen</button>
+        <span>${ICON.brief} Du bist eingeladen!</span>
+        <button type="button" class="mini-btn nein" data-antwort="nein" data-id="${e.id}">Absagen</button>
+        <button type="button" class="mini-btn ja" data-antwort="ja" data-id="${e.id}">Zusagen</button>
       </div>` : "";
   return `<li class="eintrag ${app.gewaehlt && betrifftTag(e, app.gewaehlt) && mitDatum ? "markiert" : ""}" style="--i:${i}">
     ${avatar(e.name, farbeVon(e.name))}
     <div class="eintrag-text">
       <div class="eintrag-zeile1">
         <strong>${esc(e.name)}</strong>
-        <span class="badge" style="--c:${s.farbe}">${s.emoji || ""} ${s.label}</span>
+        <span class="badge" style="--c:${s.farbe}">${statusIcon(e.status)} ${s.label}</span>
       </div>
       ${e.notiz ? `<div class="eintrag-titel">${esc(e.notiz)}</div>` : ""}
       <div class="eintrag-zeile2">
@@ -182,8 +185,8 @@ function eintragHtml(e, mitDatum, i = 0) {
       ${gaeste}${antwortKnoepfe}
     </div>
     ${meins ? `<div class="eintrag-aktionen">
-      <button type="button" class="icon-btn" data-bearbeiten="${e.id}" aria-label="Bearbeiten">✎</button>
-      <button type="button" class="icon-btn" data-loeschen="${e.id}" aria-label="Löschen">🗑</button>
+      <button type="button" class="icon-btn" data-bearbeiten="${e.id}" aria-label="Bearbeiten">${ICON.bearbeiten}</button>
+      <button type="button" class="icon-btn" data-loeschen="${e.id}" aria-label="Löschen">${ICON.loeschen}</button>
     </div>` : ""}
   </li>`;
 }
@@ -198,11 +201,11 @@ function renderTag() {
   info.hidden = v.gesamt === 0;
   const alle = v.gesamt > 0 && v.verfuegbar.length === v.gesamt;
   info.className = "tages-info" + (alle ? " alle" : v.verfuegbar.length / v.gesamt < 0.5 ? " wenige" : "");
-  info.innerHTML = `<div class="info-zeile"><strong>${alle ? "🎉 Alle haben Zeit!" : `${v.verfuegbar.length} von ${v.gesamt} verfügbar`}</strong>
+  info.innerHTML = `<div class="info-zeile"><strong>${alle ? "Alle haben Zeit!" : `${v.verfuegbar.length} von ${v.gesamt} verfügbar`}</strong>
     <span class="avatar-reihe">${v.verfuegbar.map((p) => avatar(p.name, p.farbe, "klein")).join("")}</span></div>`;
   $("tag-liste").innerHTML = v.eintraege.length
     ? v.eintraege.map((e, i) => eintragHtml(e, false, i)).join("")
-    : `<li class="leer-hinweis"><span class="leer-emoji">🌤️</span>Noch keine Einträge an diesem Tag.<br>Sei die erste Person!</li>`;
+    : `<li class="leer-hinweis"><span class="leer-ikon">${ICON.sonne}</span><br>Noch keine Einträge an diesem Tag.<br>Sei die erste Person!</li>`;
 }
 
 function renderListe() {
@@ -214,7 +217,7 @@ function renderListe() {
     .sort((a, b) => a.start.localeCompare(b.start) || (a.von || "").localeCompare(b.von || ""));
   $("liste").innerHTML = imMonat.length
     ? imMonat.map((e, i) => eintragHtml(e, true, i)).join("")
-    : `<li class="leer-hinweis"><span class="leer-emoji">📭</span>Noch keine Einträge in diesem Monat.<br>Tippe auf einen Tag, um etwas einzutragen.</li>`;
+    : `<li class="leer-hinweis"><span class="leer-ikon">${ICON.kalender}</span><br>Noch keine Einträge in diesem Monat.<br>Tippe auf einen Tag, um etwas einzutragen.</li>`;
 }
 
 function renderBeste() {
@@ -222,9 +225,9 @@ function renderBeste() {
   $("beste").innerHTML = tage.length
     ? tage.map((t, i) => {
         const anteil = Math.round((t.verfuegbar.length / t.gesamt) * 100);
-        const medaille = ["🥇", "🥈", "🥉"][i] || "📌";
+        const platz = `<span class="platz ${i === 0 ? "p1" : ""}">${i + 1}</span>`;
         return `<li style="--i:${i}"><button type="button" class="beste-tag" data-iso="${t.iso}">
-          <span class="medaille">${medaille}</span>
+          ${platz}
           <span class="beste-text">
             <span class="beste-datum">${datumLang(t.iso)}</span>
             <span class="balken"><i style="width:${anteil}%"></i></span>
@@ -232,7 +235,7 @@ function renderBeste() {
           <span class="zahl ${anteil === 100 ? "voll" : ""}">${t.verfuegbar.length}/${t.gesamt}</span>
         </button></li>`;
       }).join("")
-    : `<li class="leer-hinweis"><span class="leer-emoji">🔍</span>Sobald Personen eingetragen sind, erscheinen hier die besten Tage.</li>`;
+    : `<li class="leer-hinweis"><span class="leer-ikon">${ICON.suche}</span><br>Sobald Personen eingetragen sind, erscheinen hier die besten Tage.</li>`;
 }
 
 function renderLegende() {
@@ -240,16 +243,34 @@ function renderLegende() {
     ? [...app.personen].sort((a, b) => a.name.localeCompare(b.name))
         .map((p) => `<li class="person-pill" style="--p:${p.farbe}">${avatar(p.name, p.farbe, "klein")}${esc(p.name)}</li>`).join("")
     : `<li class="leer-hinweis">Noch niemand eingetragen.</li>`;
-  $("legende-status").innerHTML = Object.values(STATUS)
-    .map((s) => `<li><span class="badge" style="--c:${s.farbe}">${s.emoji} ${s.label}</span></li>`).join("");
+  $("legende-status").innerHTML = Object.entries(STATUS)
+    .map(([key, s]) => `<li><span class="badge" style="--c:${s.farbe}">${statusIcon(key)} ${s.label}</span></li>`).join("");
 }
 
 // ---------- Design ----------
+/** Theme-Symbole im Kopfbereich und Deko im Kalender */
+function themeDekoRendern() {
+  const id = aktuellesDesign();
+  const ic = THEME_ICON[id];
+  $("hero-icons").innerHTML = `<span>${ic}</span><span>${ic}</span><span>${ic}</span>`;
+  $("kal-deko-1").innerHTML = ic;
+  $("kal-deko-2").innerHTML = ic;
+  $("monat-ikon").innerHTML = ic;
+  $("einladung-ikon").innerHTML = ic;
+}
+
+/** Platzhalter <span data-icon="…"> mit SVG-Icons füllen */
+function iconsEinsetzen(wurzel = document) {
+  wurzel.querySelectorAll("[data-icon]").forEach((el) => {
+    const svg = ICON[el.dataset.icon];
+    if (svg) el.outerHTML = svg;
+  });
+}
 function designsRendern() {
   const aktiv = aktuellesDesign();
   $("design-auswahl").innerHTML = DESIGNS.map((d) => `
     <button type="button" class="design-karte ${d.id === aktiv ? "aktiv" : ""}" data-design-id="${d.id}" aria-pressed="${d.id === aktiv}">
-      <span class="design-name">${d.name}<small>${d.emoji}</small></span>
+      <span class="design-name">${d.name}<span class="design-ikon">${THEME_ICON[d.id]}</span></span>
       <span class="design-text">${d.text}</span>
       <span class="design-farben">${d.farben.map((f) => `<i style="background:${f}"></i>`).join("")}</span>
     </button>`).join("");
@@ -263,7 +284,7 @@ function profilOeffnen() {
   input.value = app.ich?.name || "";
   // Ein Gerät = ein Profil: Name ist fest, nur die Farbe lässt sich ändern
   input.readOnly = vorhanden;
-  $("profil-titel").textContent = vorhanden ? "Dein Profil 🎨" : "Wer bist du? 👋";
+  $("profil-titel").textContent = vorhanden ? "Dein Profil" : "Wer bist du?";
   $("profil-hinweis").textContent = vorhanden
     ? "Dein Name ist mit diesem Gerät verbunden. Die Farbe kannst du anpassen – oder das Profil ganz löschen."
     : "Pro Gerät gibt es ein Profil. Wähle deinen richtigen Namen.";
@@ -276,7 +297,7 @@ function profilOeffnen() {
   $("profil-abbrechen").hidden = !vorhanden;
   $("profil-loeschen").hidden = !vorhanden;
   $("profil-loeschen").classList.remove("sicher");
-  $("profil-loeschen").textContent = "🗑 Mein Profil und alle meine Einträge löschen";
+  $("profil-loeschen").innerHTML = `${ICON.loeschen} Mein Profil und alle meine Einträge löschen`;
   $("profil-dialog").showModal();
 }
 
@@ -303,7 +324,7 @@ async function profilSpeichern(ev) {
     app.ich = { id: GERAET_ID, name, farbe, bestaetigt: app.ich?.bestaetigt || false };
     profilMerken();
     $("profil-dialog").close();
-    toast(neu ? `Willkommen, ${name}! 🎉` : "Farbe gespeichert ✓");
+    toast(neu ? `Willkommen, ${name}!` : "Gespeichert ✓");
     if (neu) konfetti();
     render();
   } catch (e) {
@@ -326,7 +347,7 @@ async function profilLoeschen() {
     setTimeout(() => {
       if (!knopf.classList.contains("sicher")) return;
       knopf.classList.remove("sicher");
-      knopf.textContent = "🗑 Mein Profil und alle meine Einträge löschen";
+      knopf.innerHTML = `${ICON.loeschen} Mein Profil und alle meine Einträge löschen`;
     }, 4000);
     return;
   }
@@ -385,7 +406,7 @@ function profilAbgleichen(personen, vomServer) {
 function statusChipsRendern() {
   $("status-auswahl").innerHTML = Object.entries(STATUS).map(([key, s]) =>
     `<button type="button" class="status-chip ${key === app.gewaehlterStatus ? "aktiv" : ""}"
-      data-status="${key}" style="--c:${s.farbe}"><span>${s.emoji}</span> ${s.label}</button>`
+      data-status="${key}" style="--c:${s.farbe}">${statusIcon(key)} ${s.label}</button>`
   ).join("");
 }
 
@@ -409,16 +430,14 @@ function eintragOeffnen(iso, eintrag = null) {
   app.bearbeiteId = eintrag?.id || null;
   app.gewaehlterStatus = eintrag?.status || "frei";
   const start = eintrag?.start || iso;
-  $("eintrag-dialog").dataset.start = start;
   $("titel").value = eintrag?.notiz || "";
   $("titel").placeholder = eintrag ? "Eintrag bearbeiten" : "Neuer Eintrag";
-  $("eintrag-datum").textContent = datumLang(start);
   app.eingeladen = new Set(eintrag?.eingeladen || []);
   freundeChipsRendern();
-  $("von").value = eintrag?.von || "";
-  $("bis").value = eintrag?.bis || "";
-  $("ende").value = eintrag?.ende && eintrag.ende !== eintrag.start ? eintrag.ende : "";
-  $("ende").min = start;
+  feldSetzen("start", start);
+  feldSetzen("ende", eintrag?.ende && eintrag.ende !== eintrag.start ? eintrag.ende : "");
+  feldSetzen("von", eintrag?.von || "");
+  feldSetzen("bis", eintrag?.bis || "");
   $("eintrag-fehler").textContent = "";
   statusChipsRendern();
   $("eintrag-dialog").showModal();
@@ -427,16 +446,17 @@ function eintragOeffnen(iso, eintrag = null) {
 
 async function eintragSpeichern(ev) {
   ev.preventDefault();
-  const start = $("eintrag-dialog").dataset.start;
-  const von = $("von").value;
-  const bis = $("bis").value;
-  const ende = $("ende").value || start;
+  const start = feldWert("start");
+  const von = feldWert("von");
+  const bis = feldWert("bis");
+  const ende = feldWert("ende") || start;
   const fehler = $("eintrag-fehler");
 
   if (!STATUS[app.gewaehlterStatus]) return (fehler.textContent = "Bitte wähle einen Status.");
   if (bis && !von) return (fehler.textContent = "Bitte gib auch eine Von-Zeit ein.");
   if (von && bis && von >= bis) return (fehler.textContent = "Die Von-Zeit muss vor der Bis-Zeit liegen.");
-  if (ende < start) return (fehler.textContent = "Das Bis-Datum darf nicht vor dem Starttag liegen.");
+  if (!start) return (fehler.textContent = "Bitte wähle ein Datum.");
+  if (ende < start) return (fehler.textContent = "Das Bis-Datum darf nicht vor dem Von-Datum liegen.");
 
   const alt = app.eintraege.find((e) => e.id === app.bearbeiteId);
   const eingeladen = [...app.eingeladen];
@@ -470,7 +490,7 @@ async function eintragLoeschen(id, knopf) {
   if (!knopf.classList.contains("sicher")) {
     knopf.classList.add("sicher");
     knopf.textContent = "Sicher?";
-    setTimeout(() => { knopf.classList.remove("sicher"); knopf.textContent = "🗑"; }, 3000);
+    setTimeout(() => { knopf.classList.remove("sicher"); knopf.innerHTML = ICON.loeschen; }, 3000);
     return;
   }
   try {
@@ -480,6 +500,116 @@ async function eintragLoeschen(id, knopf) {
     console.error(e);
     toast("Löschen fehlgeschlagen.", true);
   }
+}
+
+// ---------- Auswahlfelder & Scroll-Rad ----------
+const ZEILE = 44; // Höhe eines Eintrags im Rad (px), passend zum CSS
+const pad2 = (n) => String(n).padStart(2, "0");
+const WT_KURZ = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+const rad = { feld: null, spalten: [] };
+
+function feldWert(id) {
+  return $(id).dataset.wert || "";
+}
+
+function feldSetzen(id, wert) {
+  const b = $(id);
+  b.dataset.wert = wert || "";
+  const zeit = b.dataset.art === "zeit";
+  let text = b.dataset.optional ? "Keine Angabe" : "Wählen";
+  if (wert && zeit) text = `${wert} Uhr`;
+  if (wert && !zeit) {
+    const d = ausIso(wert);
+    const jahr = d.getFullYear() !== new Date().getFullYear() ? ` ${String(d.getFullYear()).slice(2)}` : "";
+    text = `${WT_KURZ[d.getDay()]}, ${d.getDate()}. ${MONATE[d.getMonth()].slice(0, 3)}${jahr ? " '" + jahr.trim() : ""}`;
+  }
+  b.classList.toggle("leer", !wert);
+  b.innerHTML = `${zeit ? ICON.uhr : ICON.kalender}<span>${text}</span>`;
+  $("eintrag-fehler").textContent = "";
+}
+
+function radOeffnen(id) {
+  const b = $(id);
+  rad.feld = id;
+  $("rad-titel").textContent = b.dataset.titel;
+  $("rad-leeren").hidden = !b.dataset.optional || !b.dataset.wert;
+  let wert = b.dataset.wert;
+  if (b.dataset.art === "zeit") {
+    if (!wert) {
+      const von = feldWert("von");
+      wert = id === "bis" && von ? `${pad2(Math.min(23, +von.slice(0, 2) + 1))}:${von.slice(3)}` : "18:00";
+    }
+    const [h, m] = wert.split(":").map(Number);
+    rad.spalten = [
+      { werte: [...Array(24).keys()], zeige: pad2, wert: h },
+      { trenner: ":" },
+      { werte: Array.from({ length: 12 }, (_, i) => i * 5), zeige: pad2, wert: Math.min(55, Math.round(m / 5) * 5) },
+    ];
+  } else {
+    if (!wert) wert = id === "ende" ? feldWert("start") || heuteIso() : heuteIso();
+    const d = ausIso(wert);
+    const j = new Date().getFullYear();
+    rad.spalten = [
+      { werte: Array.from({ length: 31 }, (_, i) => i + 1), zeige: (n) => `${n}.`, wert: d.getDate() },
+      { werte: [...Array(12).keys()], zeige: (m) => MONATE[m], wert: d.getMonth(), breit: true },
+      { werte: [j - 1, j, j + 1, j + 2], zeige: String, wert: d.getFullYear() },
+    ];
+  }
+  const raeder = $("raeder");
+  raeder.innerHTML = rad.spalten.map((sp) => sp.trenner
+    ? `<span class="rad-trenner">${sp.trenner}</span>`
+    : `<div class="rad ${sp.breit ? "breit" : ""}" tabindex="0">
+        <div class="rad-polster"></div>
+        ${sp.werte.map((w, i) => `<div class="rad-item" data-i="${i}">${sp.zeige(w)}</div>`).join("")}
+        <div class="rad-polster"></div>
+      </div>`).join("");
+  $("rad-dialog").showModal();
+  const elemente = raeder.querySelectorAll(".rad");
+  rad.spalten.filter((sp) => !sp.trenner).forEach((sp, k) => {
+    const el = elemente[k];
+    const i = Math.max(0, sp.werte.indexOf(sp.wert));
+    el.scrollTop = i * ZEILE;
+    radMarkieren(el);
+    let t;
+    el.addEventListener("scroll", () => { clearTimeout(t); t = setTimeout(() => radMarkieren(el), 60); });
+    el.addEventListener("click", (e) => {
+      const it = e.target.closest(".rad-item");
+      if (it) el.scrollTo({ top: +it.dataset.i * ZEILE, behavior: "smooth" });
+    });
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        el.scrollBy({ top: e.key === "ArrowDown" ? ZEILE : -ZEILE, behavior: "smooth" });
+      }
+    });
+  });
+}
+
+function radIndex(el) {
+  const max = el.querySelectorAll(".rad-item").length - 1;
+  return Math.max(0, Math.min(max, Math.round(el.scrollTop / ZEILE)));
+}
+
+function radMarkieren(el) {
+  const i = radIndex(el);
+  el.querySelectorAll(".rad-item").forEach((it, k) => it.classList.toggle("aktiv", k === i));
+}
+
+function radUebernehmen() {
+  const spalten = rad.spalten.filter((sp) => !sp.trenner);
+  const w = [...$("raeder").querySelectorAll(".rad")].map((el, k) => spalten[k].werte[radIndex(el)]);
+  if ($(rad.feld).dataset.art === "zeit") {
+    feldSetzen(rad.feld, `${pad2(w[0])}:${pad2(w[1])}`);
+  } else {
+    const [tag, monat, jahr] = w;
+    const letzter = new Date(jahr, monat + 1, 0).getDate();
+    const iso = isoDatum(new Date(jahr, monat, Math.min(tag, letzter)));
+    feldSetzen(rad.feld, iso);
+    // Bis-Datum vor neuem Von-Datum? Dann zurücksetzen
+    if (rad.feld === "start" && feldWert("ende") && feldWert("ende") <= iso) feldSetzen("ende", "");
+    if (rad.feld === "ende" && iso === feldWert("start")) feldSetzen("ende", "");
+  }
+  $("rad-dialog").close();
 }
 
 // ---------- Einladungen ----------
@@ -499,7 +629,7 @@ function einladungPruefen() {
   const e = offeneEinladungen().find((x) => !app.spaeter.has(x.id));
   if (!e) return;
   app.offeneEinladung = e.id;
-  const s = STATUS[e.status] || { emoji: "", label: "" };
+  const s = STATUS[e.status] || { label: "" };
   const zeit = e.von ? `${e.von}${e.bis ? "–" + e.bis : ""} Uhr` : "ganztags";
   const andere = (e.eingeladen || []).filter((n) => n !== app.ich.name);
   $("einladung-titel").textContent = `${e.name} lädt dich ein!`;
@@ -508,8 +638,8 @@ function einladungPruefen() {
       ${avatar(e.name, farbeVon(e.name))}
       <div>
         <strong>${esc(e.notiz || s.label || "Treffen")}</strong>
-        <div>${s.emoji} ${datumLang(e.start)}</div>
-        <div>🕒 ${zeit}</div>
+        <div>${ICON.kalender} ${datumLang(e.start)}</div>
+        <div>${ICON.uhr} ${zeit}</div>
       </div>
     </div>
     ${andere.length ? `<p class="klein-hinweis">Auch eingeladen: ${andere.map(esc).join(", ")}</p>` : ""}`;
@@ -519,7 +649,7 @@ function einladungPruefen() {
 async function antworten(id, antwort) {
   try {
     await daten.antwortSpeichern(id, app.ich.name, antwort);
-    if (antwort === "ja") { toast("Zugesagt 🎉"); konfetti(); }
+    if (antwort === "ja") { toast("Zugesagt ✓"); konfetti(); }
     else toast("Abgesagt");
   } catch (e) {
     console.error(e);
@@ -638,7 +768,9 @@ function ereignisse() {
     if (!b) return;
     const d = designAnwenden(b.dataset.designId);
     designsRendern();
-    toast(`${d.emoji} ${d.name}`);
+    themeDekoRendern();
+    render();
+    toast(`Design: ${d.name}`);
   };
 
   $("profil-form").onsubmit = profilSpeichern;
@@ -660,12 +792,17 @@ function ereignisse() {
     app.gewaehlterStatus = b.dataset.status;
     statusChipsRendern();
   };
-  ["von", "bis", "ende"].forEach((id) => $(id).addEventListener("input", () => ($("eintrag-fehler").textContent = "")));
+  // Scroll-Räder für Uhrzeit und Datum
+  document.querySelectorAll(".wahl-feld").forEach((b) => (b.onclick = () => radOeffnen(b.id)));
+  $("rad-ok").onclick = radUebernehmen;
+  $("rad-leeren").onclick = () => { feldSetzen(rad.feld, ""); $("rad-dialog").close(); };
 }
 
 // ---------- Start ----------
 async function start() {
   designAnwenden(aktuellesDesign(), false);
+  iconsEinsetzen();
+  themeDekoRendern();
   ereignisse();
   render();
   await daten.starten();
