@@ -5,45 +5,25 @@
 //   { art: "einladung", eintrag: "<id>", an: ["Name", ...] }  → an neu Eingeladene
 //   { art: "antwort",   eintrag: "<id>", von: "Name" }        → an die Person, die eingeladen hat
 //
-// Der Text wird hier aus den Daten in Firestore gebaut – nicht aus der Anfrage –,
+// Der Text wird hier aus den Daten in Supabase gebaut – nicht aus der Anfrage –,
 // damit niemand über diese Adresse beliebige Nachrichten verschicken kann.
 // Benötigt die Umgebungsvariable VAPID_PRIVATE_KEY (in Vercel → Settings → Environment Variables).
 
 const webpush = require("web-push");
 
 const VAPID_PUBLIC_KEY = "BHRRWUAYkhJbP2XiGkMV46f4Qg3pvfQ-8LopmDQP9QA7HRlLYs9NDkrw4qJcy8-oryYSd608q8EhCOw7RkUAtVI";
-const PROJEKT = "friendlender";
-const API_KEY = "AIzaSyCS3EoViYn5o33IJJfqIivEcqcQCTcBTqA"; // öffentlicher Web-Schlüssel (steht auch in js/config.js)
-const GRUPPE = "freundeskreis";
-const BASIS = `https://firestore.googleapis.com/v1/projects/${PROJEKT}/databases/(default)/documents/gruppen/${GRUPPE}`;
+const { SUPABASE_URL, SUPABASE_ANON_KEY } = require("./_supabase.js");
 
 const STATUS = { frei: "Frei", besetzt: "Besetzt", arbeiten: "Arbeiten", arzt: "Arzt", ferien: "Ferien", treffen: "Treffen" };
 
-// Firestore-REST-Werte in normale Werte umwandeln
-function wert(v) {
-  if (!v) return undefined;
-  if ("stringValue" in v) return v.stringValue;
-  if ("integerValue" in v) return Number(v.integerValue);
-  if ("doubleValue" in v) return v.doubleValue;
-  if ("booleanValue" in v) return v.booleanValue;
-  if ("nullValue" in v) return null;
-  if ("arrayValue" in v) return (v.arrayValue.values || []).map(wert);
-  if ("mapValue" in v) return felder(v.mapValue.fields || {});
-  return undefined;
-}
-function felder(f) {
-  return Object.fromEntries(Object.entries(f || {}).map(([k, v]) => [k, wert(v)]));
-}
-
-async function holen(pfad) {
-  const r = await fetch(`${BASIS}/${pfad}?key=${API_KEY}`);
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`Firestore ${r.status}`);
-  return r.json();
-}
-async function sammlung(name) {
-  const j = await holen(`${name}?pageSize=300`);
-  return (j?.documents || []).map((d) => ({ id: d.name.split("/").pop(), ...felder(d.fields) }));
+// Supabase-REST-Abfrage (gleiche öffentliche Rechte wie die App)
+async function abfrage(pfad, optionen = {}) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${pfad}`, {
+    ...optionen,
+    headers: { apikey: SUPABASE_ANON_KEY, ...(optionen.headers || {}) },
+  });
+  if (!r.ok) throw new Error(`Supabase ${r.status}: ${await r.text()}`);
+  return optionen.method === "DELETE" ? null : r.json();
 }
 
 function datumText(start, ende, von, bis) {
@@ -66,9 +46,8 @@ module.exports = async (req, res) => {
       return res.status(400).json({ fehler: "Ungültige Anfrage" });
     }
 
-    const doc = await holen(`eintraege/${eintragId}`);
-    if (!doc) return res.status(404).json({ fehler: "Eintrag nicht gefunden" });
-    const e = felder(doc.fields);
+    const [e] = await abfrage(`eintraege?id=eq.${encodeURIComponent(eintragId)}&select=*`);
+    if (!e) return res.status(404).json({ fehler: "Eintrag nicht gefunden" });
     const eingeladen = e.eingeladen || [];
     const antworten = e.antworten || {};
     const was = e.notiz || STATUS[e.status] || "Termin";
@@ -88,7 +67,7 @@ module.exports = async (req, res) => {
     }
     if (!empfaenger.length) return res.status(200).json({ gesendet: 0 });
 
-    const [personen, abos] = await Promise.all([sammlung("personen"), sammlung("push")]);
+    const [personen, abos] = await Promise.all([abfrage("personen?select=id,name"), abfrage("push?select=id,abo")]);
     const ids = new Set(personen.filter((p) => empfaenger.includes(p.name)).map((p) => p.id));
     const ziele = abos.filter((a) => ids.has(a.id) && a.abo && a.abo.endpoint);
 
@@ -104,7 +83,7 @@ module.exports = async (req, res) => {
       } catch (err) {
         // Abgelaufene Anmeldung entfernen
         if (err.statusCode === 404 || err.statusCode === 410) {
-          await fetch(`${BASIS}/push/${z.id}?key=${API_KEY}`, { method: "DELETE" }).catch(() => {});
+          await abfrage(`push?id=eq.${encodeURIComponent(z.id)}`, { method: "DELETE" }).catch(() => {});
         } else {
           console.error("Push fehlgeschlagen", err.statusCode, err.body);
         }

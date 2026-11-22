@@ -1,14 +1,12 @@
 // ------------------------------------------------------------
-// Datenspeicher: Firebase Firestore (gemeinsam) oder localStorage (lokal)
+// Datenspeicher: Supabase (gemeinsam) oder localStorage (lokal)
 // ------------------------------------------------------------
 // Datenmodell
 //   Person:  { id (= Geräte-ID), name, farbe, geraet: true }
 //   Eintrag: { id, name, start: "YYYY-MM-DD", ende: "YYYY-MM-DD",
 //              status, von: "HH:MM" | "", bis: "HH:MM" | "", notiz, erstellt }
 
-import { FIREBASE_CONFIG, GRUPPE } from "./config.js";
-
-const FB_VERSION = "10.12.2";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, GRUPPE } from "./config.js";
 const LS_KEY = "fk-daten-" + GRUPPE;
 
 let backend = null;
@@ -30,7 +28,7 @@ export function abonnieren(fn) {
 }
 
 export function istGemeinsam() {
-  return backend?.art === "firebase";
+  return backend?.art === "supabase";
 }
 
 function neueId() {
@@ -94,65 +92,131 @@ const lokal = {
   async pushLoeschen() {},
 };
 
-// ---------- Firebase-Modus ----------
-function firebaseBackend() {
-  let fs, db;
-  const pfad = (sammlung) => ["gruppen", GRUPPE, sammlung];
+// ---------- Supabase-Modus ----------
+// Tabellen: personen, eintraege, push (Einrichtung: supabase/einrichtung.sql)
+// Live-Updates über Supabase Realtime; der letzte Stand wird zusätzlich lokal
+// zwischengespeichert, damit der Kalender auch ohne Internet sichtbar bleibt.
+const CACHE_KEY = "fk-cache-" + GRUPPE;
+
+function zeileZuEintrag(z) {
   return {
-    art: "firebase",
+    id: z.id, name: z.name, start: z.start, ende: z.ende, status: z.status,
+    von: z.von || "", bis: z.bis || "", notiz: z.notiz || "",
+    eingeladen: z.eingeladen || [], antworten: z.antworten || {}, erstellt: Number(z.erstellt) || 0,
+  };
+}
+function eintragZuZeile(e) {
+  return {
+    id: e.id, name: e.name, start: e.start, ende: e.ende || e.start, status: e.status,
+    von: e.von || "", bis: e.bis || "", notiz: e.notiz || "",
+    eingeladen: e.eingeladen || [], antworten: e.antworten || {}, erstellt: e.erstellt || Date.now(),
+  };
+}
+
+function supabaseBackend() {
+  let sb;
+  const pruefen = ({ error }) => { if (error) throw new Error(error.message); };
+
+  function cacheSichern() {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ personen: zustand.personen, eintraege: zustand.eintraege })); } catch {}
+  }
+  function cacheLaden() {
+    try {
+      const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+      zustand.personen = c.personen || [];
+      zustand.eintraege = c.eintraege || [];
+    } catch {}
+  }
+
+  async function personenLaden() {
+    const { data, error } = await sb.from("personen").select("id, name, farbe, geraet");
+    if (error) throw new Error(error.message);
+    zustand.personen = data;
+    zustand.personenVomServer = true;
+  }
+  async function eintraegeLaden() {
+    const { data, error } = await sb.from("eintraege").select("*");
+    if (error) throw new Error(error.message);
+    zustand.eintraege = data.map(zeileZuEintrag);
+  }
+
+  // Mehrere Änderungen kurz hintereinander → nur einmal neu laden
+  let timer = null;
+  function neuLadenBald(was) {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      try {
+        if (was !== "eintraege") await personenLaden();
+        if (was !== "personen") await eintraegeLaden();
+        cacheSichern(); melden();
+      } catch (e) { console.warn("Supabase:", e); }
+    }, 120);
+  }
+
+  return {
+    art: "supabase",
     async start() {
-      const appMod = await import(`https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-app.js`);
-      fs = await import(`https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-firestore.js`);
-      const app = appMod.initializeApp(FIREBASE_CONFIG);
-      db = fs.initializeFirestore(app, {
-        // Offline nutzbar – auch wenn die App in mehreren Tabs/Fenstern gleichzeitig offen ist
-        localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }),
-      });
-      fs.onSnapshot(fs.collection(db, ...pfad("personen")), { includeMetadataChanges: true }, (snap) => {
-        zustand.personen = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
-        zustand.personenVomServer = !snap.metadata.fromCache;
-        melden();
-      });
-      fs.onSnapshot(fs.collection(db, ...pfad("eintraege")), (snap) => {
-        zustand.eintraege = snap.docs.map((d) => d.data());
-        melden();
-      });
+      const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+      sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+      cacheLaden();
+      melden();
+      try {
+        await Promise.all([personenLaden(), eintraegeLaden()]);
+        cacheSichern();
+      } catch (e) {
+        // Offline: mit dem zwischengespeicherten Stand weiterarbeiten, sofern vorhanden
+        if (!zustand.personen.length && !zustand.eintraege.length) throw e;
+        console.warn("Supabase offline – zeige gespeicherten Stand.", e);
+      }
+      melden();
+      sb.channel("friendlender")
+        .on("postgres_changes", { event: "*", schema: "public", table: "personen" }, () => neuLadenBald("personen"))
+        .on("postgres_changes", { event: "*", schema: "public", table: "eintraege" }, () => neuLadenBald("eintraege"))
+        .subscribe((status) => { if (status === "SUBSCRIBED") neuLadenBald("alles"); });
+      // Nach dem Aufwachen (Handy entsperrt, App wieder im Vordergrund) frisch laden
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) neuLadenBald("alles"); });
+      window.addEventListener("online", () => neuLadenBald("alles"));
     },
     async personSpeichern(p) {
-      await fs.setDoc(fs.doc(db, ...pfad("personen"), p.id), p);
+      pruefen(await sb.from("personen").upsert({ id: p.id, name: p.name, farbe: p.farbe, geraet: true }));
+      neuLadenBald("personen");
     },
     async eintragSpeichern(e) {
-      await fs.setDoc(fs.doc(db, ...pfad("eintraege"), e.id), e);
+      pruefen(await sb.from("eintraege").upsert(eintragZuZeile(e)));
+      neuLadenBald("eintraege");
     },
     async eintragLoeschen(id) {
-      await fs.deleteDoc(fs.doc(db, ...pfad("eintraege"), id));
+      pruefen(await sb.from("eintraege").delete().eq("id", id));
+      neuLadenBald("eintraege");
     },
     async antwortSpeichern(id, name, antwort) {
-      // Nur das eine Feld ändern, damit gleichzeitige Antworten sich nicht überschreiben
-      await fs.updateDoc(fs.doc(db, ...pfad("eintraege"), id), new fs.FieldPath("antworten", name), antwort);
+      // Datenbank-Funktion ändert nur diese eine Antwort → gleichzeitige Antworten überschreiben sich nicht
+      pruefen(await sb.rpc("antwort_setzen", { p_id: id, p_name: name, p_antwort: antwort }));
+      neuLadenBald("eintraege");
     },
     async personLoeschen(id) {
-      await fs.deleteDoc(fs.doc(db, ...pfad("personen"), id));
+      pruefen(await sb.from("personen").delete().eq("id", id));
+      neuLadenBald("personen");
     },
-    // Push-Anmeldung pro Gerät (eigene Sammlung, damit das Profil-Dokument schlank bleibt)
     async pushSpeichern(id, abo) {
-      await fs.setDoc(fs.doc(db, ...pfad("push"), id), { abo, aktualisiert: Date.now() });
+      pruefen(await sb.from("push").upsert({ id, abo, aktualisiert: new Date().toISOString() }));
     },
     async pushLoeschen(id) {
-      await fs.deleteDoc(fs.doc(db, ...pfad("push"), id));
+      pruefen(await sb.from("push").delete().eq("id", id));
     },
   };
 }
 
 // ---------- Öffentliche Funktionen ----------
 export async function starten() {
-  if (FIREBASE_CONFIG) {
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     try {
-      backend = firebaseBackend();
+      backend = supabaseBackend();
       await backend.start();
       return;
     } catch (e) {
-      console.error("Firebase nicht erreichbar – wechsle in lokalen Modus.", e);
+      console.error("Supabase nicht erreichbar – wechsle in lokalen Modus.", e);
+      zustand.personen = []; zustand.eintraege = [];
     }
   }
   backend = lokal;

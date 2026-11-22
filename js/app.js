@@ -931,7 +931,7 @@ async function start() {
   const h = $("modus-hinweis");
   if (!daten.istGemeinsam()) {
     h.hidden = false;
-    h.textContent = "Lokaler Testmodus: Einträge werden nur auf diesem Gerät gespeichert. Für den gemeinsamen Kalender Firebase in js/config.js eintragen.";
+    h.textContent = "Lokaler Testmodus: Einträge werden nur auf diesem Gerät gespeichert. Für den gemeinsamen Kalender Supabase in js/config.js eintragen.";
   }
 
   daten.abonnieren(({ personen, eintraege, vomServer }) => {

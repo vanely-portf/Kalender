@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline verfügbar.
 // Nach Änderungen an Dateien VERSION erhöhen, damit Handys das Update laden.
-const VERSION = "v28";
+const VERSION = "v29";
 const CACHE = "friendlender-" + VERSION;
 const DATEIEN = [
   "./",
@@ -35,7 +35,7 @@ self.addEventListener("activate", (e) => {
 });
 
 // Eigene Dateien: zuerst Netzwerk (immer aktuell), sonst Cache (offline).
-// Fremde Anfragen (Firebase) werden nicht angefasst.
+// Fremde Anfragen (Supabase, Schriften, CDN) werden nicht angefasst.
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;

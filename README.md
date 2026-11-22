@@ -32,8 +32,11 @@ Nach jeder Änderung in `service-worker.js` die `VERSION` erhöhen, damit Handys
 | `js/app.js` | Oberfläche, Profil, Einträge, Scroll-Räder, Einladungen, Benachrichtigungen |
 | `api/push.js` | Vercel-Funktion: verschickt die Push-Benachrichtigungen |
 | `js/calendar.js` | Status, Datum, Verfügbarkeit, Monatsraster, beste Tage |
-| `js/storage.js` | Daten: Firebase Firestore (gemeinsam, live) oder lokal |
-| `js/config.js` | Firebase-Konfiguration + Gruppenname |
+| `js/storage.js` | Daten: Supabase (gemeinsam, live) oder lokal |
+| `js/config.js` | Supabase-Adresse und öffentlicher Schlüssel |
+| `supabase/einrichtung.sql` | Tabellen, Rechte und Realtime für Supabase |
+| `api/wachhalten.js` | Täglicher Aufruf, damit Supabase nicht pausiert |
+| `vercel.json` | Zeitplan für den täglichen Aufruf |
 | `js/designs.js` | Liste der Designs (Name, Farben, Schriften) |
 | `js/icons.js` | Eigene SVG-Icons (Bedienung, Status, Theme-Symbole) |
 | `js/szenen.js` | Header-Animationen + Header-Hintergründe (aus Generator erzeugt) |
@@ -41,25 +44,22 @@ Nach jeder Änderung in `service-worker.js` die `VERSION` erhöhen, damit Handys
 | `icons/` | App-Icons |
 | `start.sh`, `package.json` | Lokaler Start |
 
-## Daten (Firebase)
+## Daten (Supabase)
 
-Projekt `friendlender`, Firestore in `europe-west6` (Zürich), kostenloser Spark-Tarif.
-Pfad: `gruppen/freundeskreis/personen` und `gruppen/freundeskreis/eintraege`.
+Projekt `friendlender` bei Supabase, kostenloser **Free**-Tarif (kein Abo, keine Zahlungsdaten).
 
-Regeln (in der Firebase-Konsole):
+- Tabellen: `personen`, `eintraege`, `push` – einrichten mit **`supabase/einrichtung.sql`**
+  (Supabase → *SQL Editor* → Inhalt einfügen → *Run*).
+- Live-Updates über Supabase Realtime; der letzte Stand wird auf dem Gerät zwischengespeichert.
+- Antworten auf Einladungen setzt die Datenbank-Funktion `antwort_setzen`, damit sich
+  gleichzeitige Antworten nicht überschreiben.
+- `js/config.js` und `api/_supabase.js`: Project URL und **anon/publishable**-Schlüssel (öffentlich).
+  Den *service_role*/*secret*-Schlüssel nie ins Projekt schreiben.
+- Supabase pausiert Gratis-Projekte nach 7 Tagen ohne Aktivität. Dagegen ruft ein Vercel-Cron
+  (`vercel.json`) einmal täglich `api/wachhalten.js` auf – ebenfalls gratis.
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /gruppen/{gruppe}/{sammlung}/{id} {
-      allow read, write: if true;
-    }
-  }
-}
-```
-
-Es gibt kein Login: Wer den Link hat, kann mitlesen und mitschreiben. Teile ihn nur im Freundeskreis.
+Es gibt kein Login: Wer den Link hat, kann mitlesen und mitschreiben (Row Level Security mit
+offener Policy). Teile ihn nur im Freundeskreis.
 Ein Profil pro Gerät; jede Person kann ihr eigenes Profil samt Einträgen löschen.
 
 ## Benachrichtigungen (Push)
@@ -68,7 +68,7 @@ Wer eingeladen wird, bekommt eine Benachrichtigung – und wer einlädt, bekommt
 Das funktioniert auch bei geschlossener App und kostet nichts:
 
 - Versand über die Vercel-Funktion `api/push.js` (Hobby-Tarif, gratis) mit der Bibliothek `web-push`.
-- Die Anmeldung jedes Geräts liegt in Firestore unter `gruppen/freundeskreis/push/{Geräte-ID}`.
+- Die Anmeldung jedes Geräts liegt in der Supabase-Tabelle `push` (eine Zeile pro Gerät).
 - Der öffentliche Schlüssel steht in `js/config.js` und `api/push.js`.
 - Der **geheime Schlüssel** gehört nur in Vercel: *Settings → Environment Variables →* `VAPID_PRIVATE_KEY`.
   Nie ins GitHub-Repo schreiben.
