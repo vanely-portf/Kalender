@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline verfügbar.
 // Nach Änderungen an Dateien VERSION erhöhen, damit Handys das Update laden.
-const VERSION = "v30";
+const VERSION = "v31";
 const CACHE = "friendlender-" + VERSION;
 const DATEIEN = [
   "./",
@@ -17,6 +17,7 @@ const DATEIEN = [
   "./img/scuba-cat.webp",
   "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
+  "./icons/badge-96.png",
   "./icons/icon-512.png",
 ];
 
@@ -59,7 +60,7 @@ self.addEventListener("push", (e) => {
     self.registration.showNotification(d.titel || "Friendlender", {
       body: d.text || "",
       icon: "icons/icon-192.png",
-      badge: "icons/icon-192.png",
+      badge: "icons/badge-96.png", // Android: einfarbige Silhouette, sonst weisses Quadrat
       tag: d.tag,
       renotify: !!d.tag,
       data: { url: d.url || "./" },
