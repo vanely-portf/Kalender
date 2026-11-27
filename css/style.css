@@ -735,6 +735,15 @@ main > .karte:nth-of-type(4) { animation-delay: .15s; }
   padding: .2rem .8rem .2rem .2rem; border-radius: 999px;
 }
 .legende .leer-hinweis { width: 100%; justify-content: center; }
+.person-pill.loeschbar { padding-right: .25rem; }
+.pill-x { width: 1.5rem; height: 1.5rem; margin-left: .3rem; border: 0; border-radius: 50%; display: grid; place-items: center;
+  font-size: 1rem; line-height: 1; cursor: pointer; color: var(--leise); background: color-mix(in srgb, var(--p) 22%, transparent);
+  transition: background .2s, color .2s, transform .15s; }
+.pill-x:hover { color: #fff; background: #c2413b; }
+.pill-x:active { transform: scale(.9); }
+.person-pill.sicher { background: color-mix(in srgb, #c2413b 16%, var(--karte)); color: #a3302b; }
+.person-pill.sicher .pill-x { color: #fff; background: #c2413b; }
+.admin-hinweis { margin: .6rem 0 0; }
 
 /* ============================================================
    Knöpfe

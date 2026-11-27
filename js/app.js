@@ -2,7 +2,7 @@
 // App: Oberfläche, Ereignisse, Formulare, Prüfungen
 // ------------------------------------------------------------
 import * as daten from "./storage.js";
-import { VAPID_PUBLIC_KEY } from "./config.js";
+import { VAPID_PUBLIC_KEY, ADMIN_GERAET } from "./config.js";
 import { DESIGNS, aktuellesDesign, designAnwenden } from "./designs.js";
 import { ICON, THEME_ICON, MINI_DEKO, statusIcon } from "./icons.js";
 import { SZENEN, HIMMEL } from "./szenen.js";
@@ -243,8 +243,13 @@ function renderBeste() {
 function renderLegende() {
   $("legende-personen").innerHTML = app.personen.length
     ? [...app.personen].sort((a, b) => a.name.localeCompare(b.name))
-        .map((p) => `<li class="person-pill" style="--p:${p.farbe}">${avatar(p.name, p.farbe, "klein")}${esc(p.name)}</li>`).join("")
+        .map((p) => {
+          const loeschbar = istAdmin() && p.id !== app.ich.id;
+          return `<li class="person-pill${loeschbar ? " loeschbar" : ""}" style="--p:${p.farbe}">${avatar(p.name, p.farbe, "klein")}<span class="pill-name">${esc(p.name)}</span>${
+            loeschbar ? `<button type="button" class="pill-x" data-loeschen="${esc(p.id)}" aria-label="${esc(p.name)} löschen" title="${esc(p.name)} löschen">×</button>` : ""}</li>`;
+        }).join("")
     : `<li class="leer-hinweis">Noch niemand eingetragen.</li>`;
+  $("admin-hinweis").hidden = !istAdmin() || app.personen.length < 2;
   $("legende-status").innerHTML = Object.entries(STATUS)
     .map(([key, s]) => `<li><span class="badge" style="--c:${s.farbe}">${statusIcon(key)} ${s.label}</span></li>`).join("");
 }
@@ -355,6 +360,48 @@ async function profilSpeichern(ev) {
 }
 
 /** Eigenes Profil samt allen eigenen Einträgen löschen (zweimal tippen) */
+/** Profil samt eigenen Einträgen löschen und aus fremden Einladungen austragen */
+async function personMitDatenLoeschen(person) {
+  for (const e of app.eintraege.filter((x) => x.name === person.name)) await daten.eintragLoeschen(e.id);
+  for (const e of app.eintraege.filter((x) => x.name !== person.name && (x.eingeladen || []).includes(person.name))) {
+    const antworten = { ...(e.antworten || {}) };
+    delete antworten[person.name];
+    await daten.eintragSpeichern({ ...e, eingeladen: e.eingeladen.filter((n) => n !== person.name), antworten });
+  }
+  await daten.pushLoeschen(person.id).catch(() => {});
+  await daten.personLoeschen(person.id);
+}
+
+// ---------- Admin: nur das Profil Vane_mac (über die Geräte-ID) darf andere Profile löschen ----------
+function istAdmin() {
+  return !!app.ich && app.ich.id === ADMIN_GERAET;
+}
+
+async function fremdesProfilLoeschen(id, knopf) {
+  if (!istAdmin() || id === app.ich.id) return;
+  const person = app.personen.find((p) => p.id === id);
+  if (!person) return;
+  const li = knopf.closest("li");
+  if (!li.classList.contains("sicher")) {
+    // Erstes Tippen: nachfragen
+    li.classList.add("sicher");
+    const n = app.eintraege.filter((e) => e.name === person.name).length;
+    knopf.title = knopf.ariaLabel = `${person.name} wirklich löschen?`;
+    li.querySelector(".pill-name").textContent = n ? `Löschen? (+${n} ${n === 1 ? "Eintrag" : "Einträge"})` : "Wirklich löschen?";
+    setTimeout(() => { if (li.isConnected && li.classList.contains("sicher")) renderLegende(); }, 4000);
+    return;
+  }
+  knopf.disabled = true;
+  try {
+    await personMitDatenLoeschen(person);
+    toast(`${person.name} gelöscht ✓`);
+  } catch (e) {
+    console.error(e);
+    toast("Löschen fehlgeschlagen. Bitte erneut versuchen.", true);
+  }
+  render();
+}
+
 async function profilLoeschen() {
   const knopf = $("profil-loeschen");
   if (!app.ich) return;
@@ -377,15 +424,7 @@ async function profilLoeschen() {
   app.ich = null;
   profilMerken();
   try {
-    for (const e of meine) await daten.eintragLoeschen(e.id);
-    // Aus Einladungen anderer Einträge austragen
-    for (const e of app.eintraege.filter((x) => x.name !== ich.name && (x.eingeladen || []).includes(ich.name))) {
-      const antworten = { ...(e.antworten || {}) };
-      delete antworten[ich.name];
-      await daten.eintragSpeichern({ ...e, eingeladen: e.eingeladen.filter((n) => n !== ich.name), antworten });
-    }
-    await daten.personLoeschen(ich.id);
-    await daten.pushLoeschen(ich.id).catch(() => {});
+    await personMitDatenLoeschen(ich);
     $("profil-dialog").close();
     toast("Profil gelöscht ✓");
     render();
@@ -859,6 +898,10 @@ function ereignisse() {
     }
     freundeChipsRendern();
   };
+  $("legende-personen").addEventListener("click", (ev) => {
+    const knopf = ev.target.closest("[data-loeschen]");
+    if (knopf) fremdesProfilLoeschen(knopf.dataset.loeschen, knopf);
+  });
   $("push-btn").onclick = async () => {
     const an = $("push-btn").classList.contains("an");
     if (an) await pushAusschalten(); else await pushAktivieren();

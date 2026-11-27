@@ -13,6 +13,10 @@
 export const SUPABASE_URL = "https://hoqnrfnwgyaqmuebqvuc.supabase.co";
 export const SUPABASE_ANON_KEY = "sb_publishable_p2tXzmrFIEGvHkJWdEWCWw_f9_C5tUl";
 
+// Admin: Nur dieses Gerät (Profil „Vane_mac“) darf die Profile anderer löschen.
+// Die ID ist die Geräte-ID aus der Tabelle „personen“.
+export const ADMIN_GERAET = "04301b05-7c34-40ca-aa36-76d601792c64";
+
 // Name des Freundeskreises (für den lokalen Zwischenspeicher)
 export const GRUPPE = "freundeskreis";
 
